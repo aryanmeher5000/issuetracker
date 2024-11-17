@@ -1,12 +1,16 @@
+"use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 import { IoIosBug } from "react-icons/io";
+import classNames from "classnames";
 
 const NavBar = () => {
   const links = [
-    { name: "Dashboard", href: "/" },
-    { name: "Issues", href: "/" },
+    { name: "Dashboard", href: "/dashboard" },
+    { name: "Issues", href: "/issues" },
   ];
+  const currentPath = usePathname();
   return (
     <nav className="flex gap-4 border-b mb-5 px-4 h-14 items-center">
       <Link href="/">
@@ -16,7 +20,11 @@ const NavBar = () => {
         {links.map((k) => (
           <li
             key={k.name}
-            className="text-zinc-500 hover:text-zinc-800 transition-colors font-medium"
+            className={classNames({
+              "text-zinc-500": k.href !== currentPath,
+              "text-zinc-800": k.href === currentPath,
+              "hover:text-zinc-800 transition-colors": true,
+            })}
           >
             <Link href={k.href}>{k.name}</Link>
           </li>
