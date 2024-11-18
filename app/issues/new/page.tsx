@@ -1,6 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button, Callout, TextField } from "@radix-ui/themes";
+import { Button, Callout, Spinner, TextField } from "@radix-ui/themes";
 import { Controller, useForm } from "react-hook-form";
 import SimpleMde from "react-simplemde-editor";
 import "easymde/dist/easymde.min.css";
@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 
 type IssueForm = z.infer<typeof createIssueScehma>;
 import { CiCircleInfo } from "react-icons/ci";
-import InputErrorMessage from "./InputErrorMessage";
+import InputErrorMessage from "../../InputErrorMessage";
 
 const CreateNewIssue = () => {
   const {
@@ -24,13 +24,16 @@ const CreateNewIssue = () => {
     resolver: zodResolver(createIssueScehma), // Correct schema
   });
   const [err, setErr] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const onSubmit = async (data: IssueForm) => {
     try {
+      setIsSubmitting(true);
       await axios.post("/api/issues", data);
       router.push("/issues");
     } catch (err) {
       console.log(err);
+      setIsSubmitting(false);
       setErr("An unexpected error occured!");
     }
   };
@@ -67,7 +70,9 @@ const CreateNewIssue = () => {
         <InputErrorMessage>{errors.description?.message}</InputErrorMessage>
 
         {/* Submit Button */}
-        <Button type="submit">Submit New Issue</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          Submit New Issue {isSubmitting && <Spinner />}
+        </Button>
       </form>
     </div>
   );
