@@ -1,12 +1,12 @@
 import { Badge } from "@/app/components";
 import { Issue } from "@prisma/client";
-import { Heading, Flex, Card, Text } from "@radix-ui/themes";
+import { Heading, Flex, Card, Text, Box } from "@radix-ui/themes";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 
 const IssueDetail = ({ issue }: { issue: Issue }) => {
   return (
-    <>
+    <Box>
       <Heading className="mb-4">{issue.title}</Heading>
 
       <Flex gap="3" align="center" className="mb-4">
@@ -14,10 +14,10 @@ const IssueDetail = ({ issue }: { issue: Issue }) => {
         <Text>{issue.createdAt.toDateString()}</Text>
       </Flex>
 
-      <Card className="prose">
+      <Card className="prose max-w-full">
         <ReactMarkdown>{issue.description}</ReactMarkdown>
       </Card>
-    </>
+    </Box>
   );
 };
 

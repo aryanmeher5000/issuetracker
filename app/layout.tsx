@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
 import NavBar from "./NavBar";
-import { Theme } from "@radix-ui/themes";
+import { Container, Theme } from "@radix-ui/themes";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -33,7 +33,9 @@ export default function RootLayout({
       >
         <Theme appearance="light" accentColor="violet">
           <NavBar />
-          <main>{children}</main>
+          <main>
+            <Container>{children}</Container>
+          </main>
         </Theme>
       </body>
     </html>
