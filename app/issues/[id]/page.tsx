@@ -1,8 +1,7 @@
-import StatusBadges from "@/app/StatusBadges";
+import { Badge } from "@/app/components";
 import prisma from "@/prisma/client";
 import { Box, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { notFound } from "next/navigation";
-import React from "react";
 import ReactMarkdown from "react-markdown";
 
 interface Props {
@@ -21,7 +20,7 @@ const IssueDetailPage = async ({ params }: Props) => {
       <Heading className="mb-4">{issueDetail.title}</Heading>
 
       <Flex gap="3" align="center" className="mb-4">
-        <StatusBadges status={issueDetail.status} />
+        <Badge status={issueDetail.status} />
         <Text>{issueDetail.createdAt.toDateString()}</Text>
       </Flex>
 

@@ -4,13 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Callout, Spinner, TextField } from "@radix-ui/themes";
 import axios from "axios";
 import "easymde/dist/easymde.min.css";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { CiCircleInfo } from "react-icons/ci";
 import { z } from "zod";
-import InputErrorMessage from "../../InputErrorMessage";
-import dynamic from "next/dynamic";
+import { Error } from "../../components";
 const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -56,7 +56,7 @@ const CreateNewIssue = () => {
           placeholder="Title"
           {...register("title")}
         ></TextField.Root>
-        <InputErrorMessage>{errors.title?.message}</InputErrorMessage>
+        <Error>{errors.title?.message}</Error>
 
         <Controller
           name="description"
@@ -70,7 +70,7 @@ const CreateNewIssue = () => {
             />
           )}
         />
-        <InputErrorMessage>{errors.description?.message}</InputErrorMessage>
+        <Error>{errors.description?.message}</Error>
 
         {/* Submit Button */}
         <Button type="submit" disabled={isSubmitting}>
