@@ -1,4 +1,5 @@
 "use client";
+import { Spinner } from "@/app/components";
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -8,13 +9,15 @@ import { MdDelete } from "react-icons/md";
 const DeleteIssueButton = ({ issueId }: { issueId: number }) => {
   const router = useRouter();
   const [err, setErr] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   async function deleteIssue() {
     try {
-      throw Error();
+      setIsSubmitting(true);
       await axios.delete("/api/issues/" + issueId);
       router.push("/issues");
       router.refresh();
     } catch (err) {
+      setIsSubmitting(false);
       setErr(true);
       console.log(err);
     }
@@ -24,9 +27,9 @@ const DeleteIssueButton = ({ issueId }: { issueId: number }) => {
     <>
       <AlertDialog.Root>
         <AlertDialog.Trigger>
-          <Button color="red">
+          <Button color="red" disabled={isSubmitting}>
             <MdDelete />
-            Delete Issue
+            Delete Issue {isSubmitting && <Spinner />}
           </Button>
         </AlertDialog.Trigger>
         <AlertDialog.Content maxWidth="450px">
