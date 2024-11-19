@@ -1,18 +1,18 @@
 "use client";
+import { createIssueScehma } from "@/app/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button, Callout, Spinner, TextField } from "@radix-ui/themes";
-import { Controller, useForm } from "react-hook-form";
-import SimpleMde from "react-simplemde-editor";
-import "easymde/dist/easymde.min.css";
-import { createIssueScehma } from "@/app/validationSchema";
-import { z } from "zod";
 import axios from "axios";
-import { useState } from "react";
+import "easymde/dist/easymde.min.css";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { CiCircleInfo } from "react-icons/ci";
+import SimpleMde from "react-simplemde-editor";
+import { z } from "zod";
+import InputErrorMessage from "../../InputErrorMessage";
 
 type IssueForm = z.infer<typeof createIssueScehma>;
-import { CiCircleInfo } from "react-icons/ci";
-import InputErrorMessage from "../../InputErrorMessage";
 
 const CreateNewIssue = () => {
   const {

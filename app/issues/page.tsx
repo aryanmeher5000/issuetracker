@@ -1,5 +1,5 @@
 import prisma from "@/prisma/client";
-import { Table } from "@radix-ui/themes";
+import { Box, Table } from "@radix-ui/themes";
 import React from "react";
 import StatusBadges from "../StatusBadges";
 import delay from "delay";
@@ -11,7 +11,7 @@ const IssuePage = async () => {
   delay(5000);
 
   return (
-    <div className="p-4 space-y-4">
+    <Box className="p-4 space-y-4">
       <IssuesToolbar />
 
       <Table.Root variant="surface">
@@ -45,7 +45,7 @@ const IssuePage = async () => {
           ))}
         </Table.Body>
       </Table.Root>
-    </div>
+    </Box>
   );
 };
 
