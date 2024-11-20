@@ -6,6 +6,7 @@ import {
   Container,
   DropdownMenu,
   Flex,
+  Skeleton,
 } from "@radix-ui/themes";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
@@ -30,6 +31,7 @@ const RenderLinks = () => {
   const links = [
     { name: "Dashboard", href: "/dashboard" },
     { name: "Issues", href: "/issues" },
+    { name: "Assigned to You", href: "/assignedToYou" },
   ];
   const currentPath = usePathname();
 
@@ -44,7 +46,8 @@ const RenderLinks = () => {
             key={k.name}
             className={classNames({
               "text-zinc-400": k.href !== currentPath,
-              "text-zinc-900": k.href === currentPath,
+              "text-zinc-900 border-b-2 border-b-violet-500":
+                k.href === currentPath,
               "hover:text-zinc-800 transition-colors": true,
             })}
           >
@@ -61,6 +64,11 @@ const RenderAuth = () => {
 
   return (
     <Box>
+      <Box>
+        {status === "loading" && (
+          <Skeleton height="25px" width="70px"></Skeleton>
+        )}
+      </Box>
       <Box>
         {status === "unauthenticated" && (
           <Button color="blue">
