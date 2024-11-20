@@ -1,5 +1,6 @@
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import { IoIosBug } from "react-icons/io";
+import { SiTheboringcompany } from "react-icons/si";
 
 export default function Home() {
   return (
@@ -22,6 +23,11 @@ export default function Home() {
         any size. Experience a streamlined workflow and enhanced productivity
         today!
       </Text>
+
+      <Flex direction="column" align="center">
+        <Text weight="bold">Trusted by</Text>
+        <SiTheboringcompany fontSize="20vh" />
+      </Flex>
     </Flex>
   );
 }
