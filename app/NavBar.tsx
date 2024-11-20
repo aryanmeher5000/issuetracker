@@ -1,20 +1,40 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React from "react";
-import { IoIosBug } from "react-icons/io";
+import {
+  Avatar,
+  Box,
+  Button,
+  Container,
+  DropdownMenu,
+  Flex,
+} from "@radix-ui/themes";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { IoIosBug } from "react-icons/io";
 
 const NavBar = () => {
+  return (
+    <nav className="flex gap-4 border-b mb-5 px-4 h-14 items-center">
+      <Container>
+        <Flex justify="between" align="center" py="20px">
+          <RenderLinks />
+          <RenderAuth />
+        </Flex>
+      </Container>
+    </nav>
+  );
+};
+
+const RenderLinks = () => {
   const links = [
     { name: "Dashboard", href: "/dashboard" },
     { name: "Issues", href: "/issues" },
   ];
   const currentPath = usePathname();
-  const { status } = useSession();
+
   return (
-    <nav className="flex gap-4 border-b mb-5 px-4 h-14 items-center">
+    <Flex gap="6">
       <Link href="/">
         <IoIosBug className="size-6 text-zinc-800" />
       </Link>
@@ -32,8 +52,44 @@ const NavBar = () => {
           </li>
         ))}
       </ul>
-      <div>{status === "authenticated" && <p>Logout</p>}</div>
-    </nav>
+    </Flex>
+  );
+};
+
+const RenderAuth = () => {
+  const { status, data: session } = useSession();
+
+  return (
+    <Box>
+      <Box>
+        {status === "unauthenticated" && (
+          <Button color="blue">
+            <Link href="/api/auth/signin">Signup</Link>
+          </Button>
+        )}
+      </Box>
+      <Box>
+        {status === "authenticated" && (
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger>
+              <Avatar
+                src={session.user!.image!}
+                fallback={session.user!.name![0]}
+                radius="full"
+                className="cursor-pointer"
+                referrerPolicy="no-referrer"
+              />
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Content>
+              <DropdownMenu.Label>{session.user?.email}</DropdownMenu.Label>
+              <DropdownMenu.Item>
+                <Link href="/api/auth/signout">Signout</Link>
+              </DropdownMenu.Item>
+            </DropdownMenu.Content>
+          </DropdownMenu.Root>
+        )}
+      </Box>
+    </Box>
   );
 };
 
