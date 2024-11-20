@@ -12,16 +12,18 @@ const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
   });
   const session = await auth();
   if (!issueDetail) notFound();
-
   return (
     <Grid columns={{ initial: "1", sm: "5" }} p="4" gap="4">
       <Box className="md:col-span-4">
         <IssueDetail issue={issueDetail} />
       </Box>
+
       {session && (
         <Flex direction="column" gap="2">
           <EditIssueButton issueId={issueDetail.id} />
-          <DeleteIssueButton issueId={issueDetail.id} />
+          {session.user.role === "ADMIN" && (
+            <DeleteIssueButton issueId={issueDetail.id} />
+          )}
         </Flex>
       )}
     </Grid>

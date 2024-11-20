@@ -7,6 +7,7 @@ import {
   DropdownMenu,
   Flex,
   Skeleton,
+  Text,
 } from "@radix-ui/themes";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
@@ -89,7 +90,11 @@ const RenderAuth = () => {
               />
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
-              <DropdownMenu.Label>{session.user?.email}</DropdownMenu.Label>
+              <DropdownMenu.Label>
+                <Text weight="bold" size="3">
+                  {session.user?.email}
+                </Text>
+              </DropdownMenu.Label>
               <DropdownMenu.Item>
                 <Link href="/api/auth/signout">Signout</Link>
               </DropdownMenu.Item>
