@@ -27,6 +27,7 @@ const DetailPageLoading = () => {
       <Flex direction="column" gap="2">
         <Skeleton height="30px" />
         <Skeleton height="30px" />
+        <Skeleton height="30px" />
       </Flex>
     </Grid>
   );

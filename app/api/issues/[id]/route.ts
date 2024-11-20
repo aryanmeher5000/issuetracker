@@ -1,7 +1,55 @@
 import { issueSchema } from "@/app/validationSchema";
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "../../auth/auth";
 
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } } // Correct type for params.id
+) {
+  const body = await request.json();
+
+  // Check if assigner is admin
+  const assigner = await auth();
+  if (!assigner || assigner.user.role !== "ADMIN") {
+    return NextResponse.json(
+      { error: "Authorization denied!" },
+      { status: 401 }
+    );
+  }
+
+  // Check if assignee exists
+  const assignee = body.userId
+    ? await prisma.user.findUnique({
+        where: { id: body.userId },
+      })
+    : null;
+
+  // Parse and validate issue ID
+  const issueId = parseInt(params.id);
+  if (isNaN(issueId)) {
+    return NextResponse.json({ error: "Invalid issue ID!" }, { status: 400 });
+  }
+
+  // Assign issue to the user
+  const updatedIssue = await prisma.issue.update({
+    where: { id: issueId },
+    data: {
+      assignedToUserId: assignee?.id ? assignee?.id : null,
+    },
+  });
+  if (!updatedIssue)
+    return NextResponse.json({ error: "Issue not found!" }, { status: 404 });
+
+  return NextResponse.json(
+    assignee?.id
+      ? "Issue assigned to " + assignee.name
+      : "Unassigned the issue.",
+    { status: 200 }
+  );
+}
+
+//Update the details of an issue
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -33,6 +81,7 @@ export async function PATCH(
   return NextResponse.json(updatedIssue);
 }
 
+//Delete an issue
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
