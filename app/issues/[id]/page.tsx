@@ -7,11 +7,24 @@ import DeleteIssueButton from "./DeleteIssueButton";
 import { auth } from "@/app/api/auth/auth";
 
 const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
+  const issueId = parseInt(params.id); // Parse `id` synchronously.
+  if (isNaN(issueId)) {
+    notFound(); // Handle invalid `id`.
+  }
+
+  // Fetch issue details from the database.
   const issueDetail = await prisma.issue.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: issueId },
   });
+
+  // Authenticate the user.
   const session = await auth();
-  if (!issueDetail) notFound();
+
+  // If issue not found, return 404.
+  if (!issueDetail) {
+    notFound();
+  }
+
   return (
     <Grid columns={{ initial: "1", sm: "5" }} p="4" gap="4">
       <Box className="md:col-span-4">
