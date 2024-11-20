@@ -20,6 +20,11 @@ enum Status {
   CLOSED
 }
 
+enum Role {
+  ADMIN
+  USER
+}
+
 model Issue {
   id          Int      @id @default(autoincrement())
   title       String   @db.VarChar(250)
@@ -67,6 +72,7 @@ model User {
   image         String?
   accounts      Account[]
   sessions      Session[]
+  role          Role      @default(USER)
 
   @@map("users")
 }

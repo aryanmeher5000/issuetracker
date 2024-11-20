@@ -31,7 +31,7 @@ const RenderLinks = () => {
   const links = [
     { name: "Dashboard", href: "/dashboard" },
     { name: "Issues", href: "/issues" },
-    { name: "Assigned to You", href: "/assignedToYou" },
+    { name: "Delegated", href: "/delegated" },
   ];
   const currentPath = usePathname();
 
