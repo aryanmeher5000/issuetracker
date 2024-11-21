@@ -5,13 +5,13 @@ import { Issue, Status } from "@prisma/client";
 import { Box, Button, Select, Spinner, TextField } from "@radix-ui/themes";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+import "easymde/dist/easymde.min.css";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
-import "easymde/dist/easymde.min.css";
 import { z } from "zod";
 import { Error } from "../../components";
-import dynamic from "next/dynamic";
 const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -36,11 +36,23 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   });
 
   const crtIssue = useCreateIssue();
-  const updIssue = useUpdateIssue();
+  const updIssue = useUpdateIssue(issue?.id);
   const isLoading = crtIssue.isPending || updIssue.isPending;
   const onSubmit = async (data: FormData) => {
-    if (issue) updIssue.mutate(data);
-    else crtIssue.mutate(data);
+    if (issue) {
+      const updatedFields: Partial<FormData> = {};
+
+      // Iterate over entries and add only the updated fields
+      Object.entries(data).forEach(([key, value]) => {
+        if (value !== issue[key as keyof FormData]) {
+          updatedFields[key as keyof FormData] = value;
+        }
+      });
+
+      updIssue.mutate(updatedFields);
+    } else {
+      crtIssue.mutate(data);
+    }
   };
 
   return (
@@ -127,12 +139,12 @@ function useCreateIssue() {
   });
 }
 
-function useUpdateIssue() {
+function useUpdateIssue(id: number) {
   const router = useRouter();
 
   return useMutation<string, AxiosError<{ error: string }>, UpdateIssueSchema>({
     mutationFn: async (data) => {
-      const res = await axios.patch("/api/issues", data);
+      const res = await axios.patch("/api/issues/" + id, data);
       return res.data; // Return only the response data
     },
     onSuccess: () => {

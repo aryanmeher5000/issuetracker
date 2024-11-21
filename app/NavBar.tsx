@@ -29,32 +29,48 @@ const NavBar = () => {
 };
 
 const RenderLinks = () => {
+  const session = useSession();
   const links = [
-    { name: "Dashboard", href: "/dashboard" },
-    { name: "Issues", href: "/issues" },
-    { name: "Delegated", href: "/delegated" },
+    {
+      name: "Dashboard",
+      href: "/dashboard",
+      authenticated: true,
+    },
+    {
+      name: "Issues",
+      href: "/issues",
+      authenticated: true,
+    },
+    {
+      name: "Delegated",
+      href: "/delegated",
+      authenticated: session.status === "authenticated",
+    },
   ];
   const currentPath = usePathname();
 
   return (
-    <Flex gap="6">
+    <Flex gap="6" className="font-medium">
       <Link href="/">
         <IoIosBug className="size-6 text-zinc-800" />
       </Link>
       <ul className="flex gap-4">
-        {links.map((k) => (
-          <li
-            key={k.name}
-            className={classNames({
-              "text-zinc-400": k.href !== currentPath,
-              "text-zinc-900 border-b-2 border-b-violet-500":
-                k.href === currentPath,
-              "hover:text-zinc-800 transition-colors": true,
-            })}
-          >
-            <Link href={k.href}>{k.name}</Link>
-          </li>
-        ))}
+        {links.map(
+          (k) =>
+            k.authenticated && (
+              <li
+                key={k.name}
+                className={classNames({
+                  "text-zinc-400": k.href !== currentPath,
+                  "text-zinc-900 border-b-2 border-b-violet-500":
+                    k.href === currentPath,
+                  "hover:text-zinc-800 transition-colors": true,
+                })}
+              >
+                <Link href={k.href}>{k.name}</Link>
+              </li>
+            )
+        )}
       </ul>
     </Flex>
   );

@@ -3,37 +3,10 @@ import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/auth";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  // Validate and parse the ID
-  const id = parseInt(params.id, 10);
-
-  if (isNaN(id)) {
-    return NextResponse.json(
-      { error: "Invalid issue ID. Please provide a valid number." },
-      { status: 400 }
-    );
-  }
-
-  // Fetch the issue from the database
-  const issue = await prisma.issue.findUnique({
-    where: { id },
-  });
-
-  // If issue is not found, return a 404 response
-  if (!issue) {
-    return NextResponse.json({ error: "Issue not found." }, { status: 404 });
-  }
-
-  // Return the issue in the response
-  return NextResponse.json(issue, { status: 200 });
-}
-
+// Assign issue to a user -- Only ADMIN
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } } // Correct type for params.id
+  { params }: { params: { id: string } }
 ) {
   const body = await request.json();
 
@@ -42,7 +15,7 @@ export async function POST(
   if (!assigner || assigner.user.role !== "ADMIN") {
     return NextResponse.json(
       { error: "Authorization denied!" },
-      { status: 401 }
+      { status: 403 } // Use 403 Forbidden for insufficient permissions
     );
   }
 
@@ -53,6 +26,10 @@ export async function POST(
       })
     : null;
 
+  if (!assignee) {
+    return NextResponse.json({ error: "Assignee not found!" }, { status: 404 });
+  }
+
   // Parse and validate issue ID
   const issueId = parseInt(params.id);
   if (isNaN(issueId)) {
@@ -60,56 +37,81 @@ export async function POST(
   }
 
   // Assign issue to the user
-  const updatedIssue = await prisma.issue.update({
+  await prisma.issue.update({
     where: { id: issueId },
     data: {
-      assignedToUserId: assignee?.id ? assignee?.id : null,
+      assignedToUserId: assignee.id,
     },
   });
-  if (!updatedIssue)
-    return NextResponse.json({ error: "Issue not found!" }, { status: 404 });
 
   return NextResponse.json(
-    assignee?.id
-      ? "Issue assigned to " + assignee.name
-      : "Unassigned the issue.",
+    {
+      message: assignee.id
+        ? `Issue assigned to ${assignee.name}`
+        : "Unassigned the issue.",
+    },
     { status: 200 }
   );
 }
 
-//Update the details of an issue
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const id = parseInt(params.id);
-  if (isNaN(id)) {
-    return NextResponse.json({ error: "Invalid issue ID!" }, { status: 400 });
+  const body = await request.json();
+  const session = await auth();
+  const issueId = parseInt(params.id); // Simplified destructuring
+  const valid = updateIssueSchema.safeParse(body);
+  console.log(body);
+
+  // Check if issue exists
+  const issueEx = await prisma.issue.findUnique({
+    where: { id: issueId },
+  });
+  if (!issueEx)
+    return NextResponse.json({ error: "Issue not found!" }, { status: 404 });
+
+  // Check if ADMIN or specified user
+  if (!session?.user?.email) {
+    return NextResponse.json(
+      { error: "User not authenticated!" },
+      { status: 401 }
+    );
   }
 
-  const body = await request.json();
-  const valid = updateIssueSchema.safeParse(body);
+  const reqster = await prisma.user.findUnique({
+    where: { email: session.user.email },
+  });
 
+  if (
+    !reqster ||
+    (reqster.role !== "ADMIN" && reqster.id !== issueEx.assignedToUserId)
+  ) {
+    return NextResponse.json(
+      { error: "Authorization denied!" },
+      { status: 403 } // Forbidden
+    );
+  }
+
+  // Verify updated details
   if (!valid.success) {
     const errors = valid.error.errors.map((err) => ({
       path: err.path.join("."),
       message: err.message,
     }));
-    return NextResponse.json({ errors }, { status: 400 });
+    return NextResponse.json(errors, { status: 400 });
   }
 
+  // Update the issue with validated data (ensure only the updated fields are passed)
   const updatedIssue = await prisma.issue.update({
-    where: { id },
-    data: {
-      title: body.title,
-      description: body.description,
-    },
+    where: { id: issueId },
+    data: body, // Use validated data (not the raw body)
   });
 
   return NextResponse.json(updatedIssue);
 }
 
-//Delete an issue
+// Delete an issue -- Only if ADMIN
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -118,14 +120,22 @@ export async function DELETE(
     where: { id: parseInt(params.id) },
   });
 
+  const session = await auth();
+  if (session?.user.role !== "ADMIN")
+    return NextResponse.json(
+      { error: "Authorization denied!" },
+      { status: 403 } // Use 403 for Forbidden access
+    );
+
   if (!issueExists)
     return NextResponse.json({ error: "Invalid Issue!" }, { status: 404 });
 
   const dltdIssue = await prisma.issue.delete({
     where: { id: parseInt(params.id) },
   });
+
   return NextResponse.json(
-    { message: "Issue delted successfully.", body: dltdIssue },
+    { message: "Issue deleted successfully.", body: dltdIssue },
     { status: 200 }
   );
 }
