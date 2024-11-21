@@ -3,6 +3,34 @@ import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/auth";
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  // Validate and parse the ID
+  const id = parseInt(params.id, 10);
+
+  if (isNaN(id)) {
+    return NextResponse.json(
+      { error: "Invalid issue ID. Please provide a valid number." },
+      { status: 400 }
+    );
+  }
+
+  // Fetch the issue from the database
+  const issue = await prisma.issue.findUnique({
+    where: { id },
+  });
+
+  // If issue is not found, return a 404 response
+  if (!issue) {
+    return NextResponse.json({ error: "Issue not found." }, { status: 404 });
+  }
+
+  // Return the issue in the response
+  return NextResponse.json(issue, { status: 200 });
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } } // Correct type for params.id

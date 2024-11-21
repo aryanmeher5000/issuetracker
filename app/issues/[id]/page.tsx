@@ -7,22 +7,20 @@ import DeleteIssueButton from "./DeleteIssueButton";
 import { auth } from "@/app/api/auth/auth";
 import AssignIssue from "./AssignIssue";
 
-const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
+const IssueDetailPage = async ({ params }) => {
+  // Authenticate the user.
+  const { id } = await params;
+  const session = await auth();
+
   const issueId = parseInt(params.id); // Parse `id` synchronously.
-  if (isNaN(issueId)) {
-    notFound(); // Handle invalid `id`.
-  }
 
   // Fetch issue details from the database.
   const issueDetail = await prisma.issue.findUnique({
     where: { id: issueId },
     include: {
-      assignedToUser: {},
+      assignedToUser: true,
     },
   });
-
-  // Authenticate the user.
-  const session = await auth();
 
   // If issue not found, return 404.
   if (!issueDetail) {

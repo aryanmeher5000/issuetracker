@@ -26,8 +26,13 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     register,
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm<FormData>({
+    defaultValues: {
+      title: issue?.title,
+      description: issue?.description,
+      status: issue?.status,
+    },
     resolver: zodResolver(schema), // Correct schema
   });
 
@@ -35,8 +40,9 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   const updIssue = useUpdateIssue();
   const isLoading = crtIssue.isPending || updIssue.isPending;
   const onSubmit = async (data: FormData) => {
-    if (issue) updIssue.mutate(data);
-    else crtIssue.mutate(data);
+    // if (issue) updIssue.mutate(data);
+    // else crtIssue.mutate(data);
+    if (isDirty) console.log(data);
   };
 
   return (
@@ -44,7 +50,6 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <TextField.Root
           placeholder="Title"
-          defaultValue={issue?.title}
           {...register("title")}
         ></TextField.Root>
         <Error>{errors.title?.message}</Error>
@@ -52,7 +57,6 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         <Controller
           name="description"
           control={control}
-          defaultValue={issue?.description}
           render={({ field }) => (
             <SimpleMde
               {...field}
@@ -67,7 +71,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         {/*Update status of issue*/}
         {issue && (
           <Box>
-            <Select.Root defaultValue={issue?.status} {...register("status")}>
+            <Select.Root defaultValue={issue.status} {...register("status")}>
               <Select.Trigger
                 placeholder="Update status of issue"
                 style={{ width: "140px" }}
