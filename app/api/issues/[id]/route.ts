@@ -1,4 +1,4 @@
-import { issueSchema } from "@/app/validationSchema";
+import { updateIssueSchema } from "@/app/validationSchema";
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/auth";
@@ -60,7 +60,7 @@ export async function PATCH(
   }
 
   const body = await request.json();
-  const valid = issueSchema.safeParse(body);
+  const valid = updateIssueSchema.safeParse(body);
 
   if (!valid.success) {
     const errors = valid.error.errors.map((err) => ({

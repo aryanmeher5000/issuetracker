@@ -1,56 +1,46 @@
 "use client";
-import { issueSchema } from "@/app/validationSchema";
+import { createIssueSchema, updateIssueSchema } from "@/app/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Issue } from "@prisma/client";
-import { Button, Callout, Spinner, TextField } from "@radix-ui/themes";
-import axios from "axios";
+import { Issue, Status } from "@prisma/client";
+import { Box, Button, Select, Spinner, TextField } from "@radix-ui/themes";
+import axios, { AxiosError } from "axios";
 import "easymde/dist/easymde.min.css";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { CiCircleInfo } from "react-icons/ci";
+import SimpleMde from "react-simplemde-editor";
 import { z } from "zod";
 import { Error } from "../../components";
-import SimpleMde from "react-simplemde-editor";
+import { useMutation } from "@tanstack/react-query";
+import toast, { Toaster } from "react-hot-toast";
 
-type IssueFormData = z.infer<typeof issueSchema>;
+type CreateIssueSchema = z.infer<typeof createIssueSchema>;
+type UpdateIssueSchema = z.infer<typeof updateIssueSchema>;
 
 const IssueForm = ({ issue }: { issue?: Issue }) => {
+  const schema = issue ? updateIssueSchema : createIssueSchema;
+  type FormData = typeof issue extends undefined
+    ? CreateIssueSchema
+    : UpdateIssueSchema;
+
   const {
     register,
     handleSubmit,
     control,
     formState: { errors },
-  } = useForm<IssueFormData>({
-    resolver: zodResolver(issueSchema), // Correct schema
+  } = useForm<FormData>({
+    resolver: zodResolver(schema), // Correct schema
   });
-  const [err, setErr] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const router = useRouter();
-  const onSubmit = async (data: IssueFormData) => {
-    try {
-      setIsSubmitting(true);
-      if (issue) await axios.patch("/api/issues/" + issue.id, data);
-      else await axios.post("/api/issues", data);
-      router.push("/issues");
-      router.refresh();
-    } catch (err) {
-      console.log(err);
-      setIsSubmitting(false);
-      setErr("An unexpected error occured!");
-    }
+
+  const crtIssue = useCreateIssue();
+  const updIssue = useUpdateIssue();
+  const isLoading = crtIssue.isPending || updIssue.isPending;
+  const onSubmit = async (data: FormData) => {
+    if (issue) updIssue.mutate(data);
+    else crtIssue.mutate(data);
   };
 
   return (
-    <div className="max-w-xl  p-4">
-      {err && (
-        <Callout.Root className="mb-5" color="red">
-          <Callout.Icon>
-            <CiCircleInfo />
-          </Callout.Icon>
-          <Callout.Text>{err}</Callout.Text>
-        </Callout.Root>
-      )}
+    <Box className="max-w-xl  p-4">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <TextField.Root
           placeholder="Title"
@@ -74,14 +64,76 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         />
         <Error>{errors.description?.message}</Error>
 
+        {/*Update status of issue*/}
+        {issue && (
+          <Box>
+            <Select.Root defaultValue={issue?.status} {...register("status")}>
+              <Select.Trigger
+                placeholder="Update status of issue"
+                style={{ width: "140px" }}
+              />
+              <Select.Content>
+                {Object.entries(Status).map((k) => (
+                  <Select.Item key={k[0]} value={k[0]}>
+                    {k[1]}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          </Box>
+        )}
+
         {/* Submit Button */}
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isLoading}>
           {issue ? "Update This Issue" : "Submit New Issue"}{" "}
-          {isSubmitting && <Spinner />}
+          {isLoading && <Spinner />}
         </Button>
       </form>
-    </div>
+      <Toaster />
+    </Box>
   );
 };
+
+function useCreateIssue() {
+  const router = useRouter();
+
+  return useMutation<string, AxiosError<{ error: string }>, CreateIssueSchema>({
+    mutationFn: async (data) => {
+      const res = await axios.post("/api/issues", data);
+      return res.data; // Return only the response data
+    },
+    onSuccess: () => {
+      toast.success("Issue created successfully!"); // Add success feedback
+      router.push("/issues"); // Navigate to the issues page
+      router.refresh(); // Refresh the data
+    },
+    onError: (err) => {
+      const errorMessage =
+        err.response?.data?.error || "An unexpected error occurred.";
+      toast.error(errorMessage); // Show error message
+    },
+  });
+}
+
+function useUpdateIssue() {
+  const router = useRouter();
+
+  return useMutation<string, AxiosError<{ error: string }>, UpdateIssueSchema>({
+    mutationFn: async (data) => {
+      const res = await axios.patch("/api/issues", data);
+      return res.data; // Return only the response data
+    },
+    onSuccess: () => {
+      toast.success("Issue created successfully!"); // Add success feedback
+      router.push("/issues"); // Navigate to the issues page
+      router.refresh(); // Refresh the data
+    },
+    onError: (err) => {
+      const errorMessage =
+        err.response?.data?.error || "An unexpected error occurred.";
+      toast.error(errorMessage); // Show error message
+    },
+  });
+}
 
 export default IssueForm;
