@@ -7,12 +7,12 @@ import DeleteIssueButton from "./DeleteIssueButton";
 import { auth } from "@/app/api/auth/auth";
 import AssignIssue from "./AssignIssue";
 
-const IssueDetailPage = async ({ params }) => {
+const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
   // Authenticate the user.
-  const { id } = await params;
   const session = await auth();
+  const { id } = await params;
 
-  const issueId = parseInt(params.id); // Parse `id` synchronously.
+  const issueId = parseInt(id); // Parse `id` synchronously.
 
   // Fetch issue details from the database.
   const issueDetail = await prisma.issue.findUnique({
@@ -36,10 +36,7 @@ const IssueDetailPage = async ({ params }) => {
       {session && (
         <Flex direction="column" gap="2">
           {session.user.role === "ADMIN" && (
-            <AssignIssue
-              id={parseInt(params.id)}
-              assignee={issueDetail.assignedToUser!}
-            />
+            <AssignIssue id={issueId} assignee={issueDetail.assignedToUser!} />
           )}
           <EditIssueButton issueId={issueDetail.id} />
           {session.user.role === "ADMIN" && (

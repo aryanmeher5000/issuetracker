@@ -3,15 +3,18 @@ import { createIssueSchema, updateIssueSchema } from "@/app/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Issue, Status } from "@prisma/client";
 import { Box, Button, Select, Spinner, TextField } from "@radix-ui/themes";
+import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import "easymde/dist/easymde.min.css";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import SimpleMde from "react-simplemde-editor";
+import toast, { Toaster } from "react-hot-toast";
+import "easymde/dist/easymde.min.css";
 import { z } from "zod";
 import { Error } from "../../components";
-import { useMutation } from "@tanstack/react-query";
-import toast, { Toaster } from "react-hot-toast";
+import dynamic from "next/dynamic";
+const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
+  ssr: false,
+});
 
 type CreateIssueSchema = z.infer<typeof createIssueSchema>;
 type UpdateIssueSchema = z.infer<typeof updateIssueSchema>;
@@ -28,11 +31,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     control,
     formState: { errors, isDirty },
   } = useForm<FormData>({
-    defaultValues: {
-      title: issue?.title,
-      description: issue?.description,
-      status: issue?.status,
-    },
+    defaultValues: issue,
     resolver: zodResolver(schema), // Correct schema
   });
 
@@ -40,9 +39,8 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   const updIssue = useUpdateIssue();
   const isLoading = crtIssue.isPending || updIssue.isPending;
   const onSubmit = async (data: FormData) => {
-    // if (issue) updIssue.mutate(data);
-    // else crtIssue.mutate(data);
-    if (isDirty) console.log(data);
+    if (issue) updIssue.mutate(data);
+    else crtIssue.mutate(data);
   };
 
   return (
@@ -71,24 +69,34 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         {/*Update status of issue*/}
         {issue && (
           <Box>
-            <Select.Root defaultValue={issue.status} {...register("status")}>
-              <Select.Trigger
-                placeholder="Update status of issue"
-                style={{ width: "140px" }}
-              />
-              <Select.Content>
-                {Object.entries(Status).map((k) => (
-                  <Select.Item key={k[0]} value={k[0]}>
-                    {k[1]}
-                  </Select.Item>
-                ))}
-              </Select.Content>
-            </Select.Root>
+            <Controller
+              name="status"
+              control={control}
+              defaultValue={issue.status}
+              render={({ field }) => (
+                <Select.Root
+                  value={field.value!} // Bind the value from react-hook-form
+                  onValueChange={(value) => field.onChange(value)} // Use onValueChange for updates
+                >
+                  <Select.Trigger
+                    placeholder="Update status of issue"
+                    style={{ width: "140px" }}
+                  />
+                  <Select.Content>
+                    {Object.entries(Status).map(([key, label]) => (
+                      <Select.Item key={key} value={key}>
+                        {label}
+                      </Select.Item>
+                    ))}
+                  </Select.Content>
+                </Select.Root>
+              )}
+            />
           </Box>
         )}
 
         {/* Submit Button */}
-        <Button type="submit" disabled={isLoading}>
+        <Button type="submit" disabled={isLoading || !isDirty}>
           {issue ? "Update This Issue" : "Submit New Issue"}{" "}
           {isLoading && <Spinner />}
         </Button>
