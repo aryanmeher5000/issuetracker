@@ -89,7 +89,7 @@ function useAssignIssue() {
       });
       return res.data;
     },
-    onSuccess: (msg: string) => {
+    onSuccess: ({ msg }: { msg: string }) => {
       toast.success(msg);
     },
     onError: (err: AxiosError<{ error: string }>) => {

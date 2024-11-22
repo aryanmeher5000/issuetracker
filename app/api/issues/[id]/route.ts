@@ -8,50 +8,64 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const body = await request.json();
+  try {
+    const body = await request.json();
+    const { id } = await params;
 
-  // Check if assigner is admin
-  const assigner = await auth();
-  if (!assigner || assigner.user.role !== "ADMIN") {
+    // Parse and validate issue ID
+    const issueId = parseInt(id, 10);
+    if (isNaN(issueId)) {
+      return NextResponse.json(
+        { error: "Invalid issue ID. It must be a number." },
+        { status: 400 }
+      );
+    }
+
+    // Check if assigner is an admin
+    const assigner = await auth();
+    if (!assigner || assigner.user.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Authorization denied! Only admins can perform this action." },
+        { status: 403 }
+      );
+    }
+
+    // Validate userId from the body (if provided)
+    const userId = body.userId || null;
+    let assignee = null;
+    if (userId) {
+      assignee = await prisma.user.findUnique({ where: { id: userId } });
+      if (!assignee) {
+        return NextResponse.json(
+          { error: `User with ID ${userId} not found.` },
+          { status: 404 }
+        );
+      }
+    }
+
+    // Assign or unassign the issue
+    const updatedIssue = await prisma.issue.update({
+      where: { id: issueId },
+      data: { assignedToUserId: assignee?.id || null },
+    });
+
+    // Respond with success
     return NextResponse.json(
-      { error: "Authorization denied!" },
-      { status: 403 } // Use 403 Forbidden for insufficient permissions
+      {
+        message: assignee
+          ? `Issue successfully assigned to ${assignee.name}.`
+          : "Issue successfully unassigned.",
+        issue: updatedIssue, // Optionally include the updated issue
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error assigning issue:", error);
+    return NextResponse.json(
+      { error: "An unexpected error occurred." },
+      { status: 500 }
     );
   }
-
-  // Check if assignee exists
-  const assignee = body.userId
-    ? await prisma.user.findUnique({
-        where: { id: body.userId },
-      })
-    : null;
-
-  if (!assignee) {
-    return NextResponse.json({ error: "Assignee not found!" }, { status: 404 });
-  }
-
-  // Parse and validate issue ID
-  const issueId = parseInt(params.id);
-  if (isNaN(issueId)) {
-    return NextResponse.json({ error: "Invalid issue ID!" }, { status: 400 });
-  }
-
-  // Assign issue to the user
-  await prisma.issue.update({
-    where: { id: issueId },
-    data: {
-      assignedToUserId: assignee.id,
-    },
-  });
-
-  return NextResponse.json(
-    {
-      message: assignee.id
-        ? `Issue assigned to ${assignee.name}`
-        : "Unassigned the issue.",
-    },
-    { status: 200 }
-  );
 }
 
 export async function PATCH(
@@ -60,7 +74,8 @@ export async function PATCH(
 ) {
   const body = await request.json();
   const session = await auth();
-  const issueId = parseInt(params.id); // Simplified destructuring
+  const { id } = await params;
+  const issueId = parseInt(id);
 
   // Check if issue exists
   const issueEx = await prisma.issue.findUnique({
@@ -70,7 +85,7 @@ export async function PATCH(
     return NextResponse.json({ error: "Issue not found!" }, { status: 404 });
 
   // Check if ADMIN or specified user
-  if (!session?.user?.email) {
+  if (!session || !session?.user?.email) {
     return NextResponse.json(
       { error: "User not authenticated!" },
       { status: 401 }
@@ -95,11 +110,10 @@ export async function PATCH(
   // Verify updated details
   const valid = updateIssueSchema.safeParse(body);
   if (!valid.success) {
-    const errors = valid.error.errors.map((err) => ({
-      path: err.path.join("."),
-      message: err.message,
-    }));
-    return NextResponse.json(errors, { status: 400 });
+    return NextResponse.json(
+      { error: "The form dosent satisfy the required constraints!" },
+      { status: 400 }
+    );
   }
 
   // Update the issue with validated data (ensure only the updated fields are passed)
@@ -108,7 +122,7 @@ export async function PATCH(
     data: body, // Use validated data (not the raw body)
   });
 
-  return NextResponse.json(updatedIssue);
+  return NextResponse.json(updatedIssue, { status: 200 });
 }
 
 // Delete an issue -- Only if ADMIN
@@ -121,7 +135,7 @@ export async function DELETE(
   });
 
   const session = await auth();
-  if (session?.user.role !== "ADMIN")
+  if (!session || session?.user.role !== "ADMIN")
     return NextResponse.json(
       { error: "Authorization denied!" },
       { status: 403 } // Use 403 for Forbidden access

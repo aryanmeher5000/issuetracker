@@ -40,12 +40,12 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   const isLoading = crtIssue.isPending || updIssue.isPending;
   const onSubmit = async (data: FormData) => {
     if (issue) {
-      const updatedFields: FormData = {} as FormData;
+      const updatedFields = {};
 
       // Iterate over entries and add only the updated fields
       Object.entries(data).forEach(([key, value]) => {
         if (value !== issue[key as keyof FormData]) {
-          updatedFields[key] = value;
+          Object.assign(updatedFields, { [key]: value });
         }
       });
 
@@ -127,9 +127,9 @@ function useCreateIssue() {
       return res.data; // Return only the response data
     },
     onSuccess: () => {
-      toast.success("Issue created successfully!"); // Add success feedback
       router.push("/issues"); // Navigate to the issues page
       router.refresh(); // Refresh the data
+      toast.success("Issue created successfully!"); // Add success feedback
     },
     onError: (err) => {
       const errorMessage =
@@ -139,11 +139,11 @@ function useCreateIssue() {
   });
 }
 
-export function useUpdateIssue() {
+function useUpdateIssue() {
   const router = useRouter();
 
   return useMutation<
-    string, // The type of the data returned by the mutation
+    { message: string }, // The type of the data returned by the mutation
     AxiosError<{ error: string }>, // The type of the error object
     { data: UpdateIssueSchema; id: number } // The input arguments to the mutation
   >({

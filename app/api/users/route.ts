@@ -4,7 +4,7 @@ import { auth } from "../auth/auth";
 
 export async function GET() {
   const requester = await auth();
-  if (requester?.user.role !== "ADMIN")
+  if (requester && requester?.user.role !== "ADMIN")
     return NextResponse.json(
       { error: "Authorization denied!" },
       { status: 401 }
