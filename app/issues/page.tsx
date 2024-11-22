@@ -4,6 +4,7 @@ import React from "react";
 import delay from "delay";
 import IssuesToolbar from "./IssuesToolbar";
 import IssuesTable from "../components/IssuesTable";
+import Filters from "../components/Filters";
 
 const IssuePage = async () => {
   const issues = await prisma.issue.findMany();
@@ -12,6 +13,7 @@ const IssuePage = async () => {
   return (
     <Box className="p-4 space-y-4">
       <IssuesToolbar />
+      <Filters />
       <IssuesTable issues={issues} />
     </Box>
   );

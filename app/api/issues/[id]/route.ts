@@ -61,8 +61,6 @@ export async function PATCH(
   const body = await request.json();
   const session = await auth();
   const issueId = parseInt(params.id); // Simplified destructuring
-  const valid = updateIssueSchema.safeParse(body);
-  console.log(body);
 
   // Check if issue exists
   const issueEx = await prisma.issue.findUnique({
@@ -85,7 +83,8 @@ export async function PATCH(
 
   if (
     !reqster ||
-    (reqster.role !== "ADMIN" && reqster.id !== issueEx.assignedToUserId)
+    reqster.role !== "ADMIN" ||
+    reqster.id !== issueEx.assignedToUserId
   ) {
     return NextResponse.json(
       { error: "Authorization denied!" },
@@ -94,6 +93,7 @@ export async function PATCH(
   }
 
   // Verify updated details
+  const valid = updateIssueSchema.safeParse(body);
   if (!valid.success) {
     const errors = valid.error.errors.map((err) => ({
       path: err.path.join("."),

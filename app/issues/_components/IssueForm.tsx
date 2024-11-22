@@ -36,20 +36,20 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   });
 
   const crtIssue = useCreateIssue();
-  const updIssue = useUpdateIssue(issue?.id);
+  const updIssue = useUpdateIssue();
   const isLoading = crtIssue.isPending || updIssue.isPending;
   const onSubmit = async (data: FormData) => {
     if (issue) {
-      const updatedFields: Partial<FormData> = {};
+      const updatedFields: FormData = {} as FormData;
 
       // Iterate over entries and add only the updated fields
       Object.entries(data).forEach(([key, value]) => {
         if (value !== issue[key as keyof FormData]) {
-          updatedFields[key as keyof FormData] = value;
+          updatedFields[key] = value;
         }
       });
 
-      updIssue.mutate(updatedFields);
+      updIssue.mutate({ data: updatedFields, id: issue.id });
     } else {
       crtIssue.mutate(data);
     }
@@ -139,23 +139,27 @@ function useCreateIssue() {
   });
 }
 
-function useUpdateIssue(id: number) {
+export function useUpdateIssue() {
   const router = useRouter();
 
-  return useMutation<string, AxiosError<{ error: string }>, UpdateIssueSchema>({
-    mutationFn: async (data) => {
-      const res = await axios.patch("/api/issues/" + id, data);
+  return useMutation<
+    string, // The type of the data returned by the mutation
+    AxiosError<{ error: string }>, // The type of the error object
+    { data: UpdateIssueSchema; id: number } // The input arguments to the mutation
+  >({
+    mutationFn: async ({ data, id }) => {
+      const res = await axios.patch(`/api/issues/${id}`, data);
       return res.data; // Return only the response data
     },
     onSuccess: () => {
-      toast.success("Issue created successfully!"); // Add success feedback
-      router.push("/issues"); // Navigate to the issues page
-      router.refresh(); // Refresh the data
+      toast.success("Issue updated successfully!");
+      router.push("/issues");
+      // `router.refresh()` is not available in Next.js router. If you're using Next.js App Router, remove the refresh.
     },
-    onError: (err) => {
+    onError: (error) => {
       const errorMessage =
-        err.response?.data?.error || "An unexpected error occurred.";
-      toast.error(errorMessage); // Show error message
+        error.response?.data?.error || "An unexpected error occurred.";
+      toast.error(errorMessage);
     },
   });
 }

@@ -1,14 +1,14 @@
-import { Button } from "@radix-ui/themes";
-import Link from "next/link";
+"use client";
+import { Box, Button } from "@radix-ui/themes";
+import { useRouter } from "next/navigation";
 import React from "react";
 
 const IssuesToolbar = () => {
+  const router = useRouter();
   return (
-    <div>
-      <Button>
-        <Link href="/issues/new">New Issue</Link>
-      </Button>
-    </div>
+    <Box>
+      <Button onClick={() => router.push("/issues/new")}>New Issue</Button>
+    </Box>
   );
 };
 

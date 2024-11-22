@@ -44,7 +44,7 @@ const RenderLinks = () => {
     {
       name: "Delegated",
       href: "/delegated",
-      authenticated: session.status === "authenticated",
+      authenticated: session && session.status === "authenticated",
     },
   ];
   const currentPath = usePathname();
