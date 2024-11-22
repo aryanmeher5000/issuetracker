@@ -6,6 +6,7 @@ import IssueDetail from "./IssueDetail";
 import DeleteIssueButton from "./DeleteIssueButton";
 import { auth } from "@/app/api/auth/auth";
 import AssignIssue from "./AssignIssue";
+import ReopenIssueButton from "./ReopenIssueButton";
 
 const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
   // Authenticate the user.
@@ -35,10 +36,20 @@ const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
 
       {session && (
         <Flex direction="column" gap="2">
-          {session.user.role === "ADMIN" && (
-            <AssignIssue id={issueId} assignee={issueDetail.assignedToUser!} />
+          {issueDetail.status !== "CLOSED" ? (
+            <>
+              {" "}
+              {session.user.role === "ADMIN" && (
+                <AssignIssue
+                  id={issueId}
+                  assignee={issueDetail.assignedToUser!}
+                />
+              )}
+              <EditIssueButton issueId={issueDetail.id} />
+            </>
+          ) : (
+            <ReopenIssueButton id={issueId} />
           )}
-          <EditIssueButton issueId={issueDetail.id} />
           {session.user.role === "ADMIN" && (
             <DeleteIssueButton issueId={issueDetail.id} />
           )}
