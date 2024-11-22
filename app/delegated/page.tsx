@@ -1,34 +1,44 @@
 import prisma from "@/prisma/client";
-import { Box, Text } from "@radix-ui/themes";
+import { Box } from "@radix-ui/themes";
 import { auth } from "../api/auth/auth";
 import IssuesTable from "../components/IssuesTable";
+import Filters from "../components/Filters";
+import { Status } from "@prisma/client";
 
-const DelegatedIssues = async () => {
+const DelegatedIssues = async ({
+  searchParams,
+}: {
+  searchParams: { status: string; orderBy: string; order: string };
+}) => {
   // Authenticate the user
   const session = await auth();
 
-  // Fetch delegated issues using Prisma
+  // Construct the filter query dynamically
+  const { status, orderBy, order } = await searchParams;
+
+  const validStatus =
+    status && Object.values(Status).includes(status as Status)
+      ? (status as Status)
+      : undefined;
+
   const delegatedIssues = await prisma.user.findUnique({
     where: { email: session!.user.email! },
     select: {
-      assignedIssues: true, // Select only assigned issues for efficiency
+      assignedIssues: {
+        where: { status: validStatus },
+        orderBy: orderBy
+          ? {
+              [orderBy]: order || "asc",
+            }
+          : undefined,
+      },
     },
   });
 
-  // Early return if there are no delegated issues
-  const issues = delegatedIssues?.assignedIssues || [];
-  if (issues.length === 0) {
-    return (
-      <Box>
-        <Text>There are no issues currently delegated to you.</Text>
-      </Box>
-    );
-  }
-
-  // Render the issues table
   return (
-    <Box>
-      <IssuesTable issues={issues} />
+    <Box className="space-y-4">
+      <Filters />
+      <IssuesTable issues={delegatedIssues!.assignedIssues} />
     </Box>
   );
 };

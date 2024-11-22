@@ -1,14 +1,32 @@
 import prisma from "@/prisma/client";
 import { Box } from "@radix-ui/themes";
 import React from "react";
-import delay from "delay";
 import IssuesToolbar from "./IssuesToolbar";
 import IssuesTable from "../components/IssuesTable";
 import Filters from "../components/Filters";
+import { Status } from "@prisma/client";
 
-const IssuePage = async () => {
-  const issues = await prisma.issue.findMany();
-  delay(5000);
+const IssuePage = async ({
+  searchParams,
+}: {
+  searchParams: { status: string; orderBy: string; order: string };
+}) => {
+  // Construct the orderBy object dynamically
+  const { status, orderBy, order } = await searchParams;
+
+  const validStatus =
+    status && Object.values(Status).includes(status as Status)
+      ? (status as Status)
+      : undefined;
+
+  const issues = await prisma.issue.findMany({
+    where: { status: validStatus },
+    orderBy: orderBy
+      ? {
+          [orderBy]: order || "asc",
+        }
+      : undefined,
+  });
 
   return (
     <Box className="p-4 space-y-4">
