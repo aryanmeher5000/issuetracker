@@ -26,12 +26,14 @@ const Filters = () => {
       params.set("status", status);
     }
     // Retain the orderBy and order parameter if present
-    if (searchParams.get("sortBy")) {
-      params.set("orderBy", searchParams.get("sortBy")!);
+    if (searchParams.get("orderBy")) {
+      params.set("orderBy", searchParams.get("orderBy")!);
       params.set("order", params.get("order")!);
     }
     // Push updated query to the router
-    const query = params.toString() ? `${pathName}?${params.toString()}` : "";
+    const query = params.toString()
+      ? `${pathName}?${params.toString()}`
+      : pathName;
     push(query);
   }
 
