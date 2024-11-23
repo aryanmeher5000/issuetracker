@@ -1,12 +1,14 @@
+"use client";
 import { Button } from "@radix-ui/themes";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FiEdit } from "react-icons/fi";
 
 const EditIssueButton = ({ issueId }: { issueId: number }) => {
+  const { push } = useRouter();
   return (
-    <Button>
+    <Button onClick={() => push(`/issues/edit/${issueId}`)}>
       <FiEdit />
-      <Link href={`/issues/edit/${issueId}`}>Edit Issue</Link>
+      Edit Issue
     </Button>
   );
 };

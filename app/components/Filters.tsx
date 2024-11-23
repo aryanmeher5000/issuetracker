@@ -25,11 +25,8 @@ const Filters = () => {
     } else {
       params.set("status", status);
     }
-    // Retain the orderBy and order parameter if present
-    if (searchParams.get("orderBy")) {
-      params.set("orderBy", searchParams.get("orderBy")!);
-      params.set("order", params.get("order")!);
-    }
+    //Delete the page param
+    if (params.has("page")) params.delete("page");
     // Push updated query to the router
     const query = params.toString()
       ? `${pathName}?${params.toString()}`
@@ -38,7 +35,7 @@ const Filters = () => {
   }
 
   return (
-    <Box className="space-x-4">
+    <Box>
       <Select.Root onValueChange={handleValueChange} defaultValue={currStat}>
         <Select.Trigger placeholder="Filter by status" />
         <Select.Content>

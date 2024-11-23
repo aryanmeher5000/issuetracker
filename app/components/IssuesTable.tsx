@@ -11,16 +11,17 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
     {
       label: "Issue",
       value: "title",
-      class: "hidden md:table-cell cursor-pointer",
+      class: "cursor-pointer",
     },
     {
       label: "Status",
       value: "status",
+      class: "hidden md:table-cell ",
     },
     {
       label: "Created At",
       value: "createdAt",
-      class: "hidden md:table-cell cursor-pointer",
+      class: "cursor-pointer",
     },
   ];
 
@@ -31,12 +32,7 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
   const [arrowOn, setArrowOn] = useState("");
 
   function handleSort(val: string) {
-    const params = new URLSearchParams();
-
-    // Retain the status parameter if present
-    if (searchParams.get("status")) {
-      params.set("status", searchParams.get("status")!);
-    }
+    const params = new URLSearchParams(searchParams);
 
     //Check order and orderBy
     if (val === "status") return;
@@ -92,9 +88,7 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
               <Table.Cell className="hidden md:table-cell">
                 {<Badge status={k.status} />}
               </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                {k.createdAt.toDateString()}
-              </Table.Cell>
+              <Table.Cell>{k.createdAt.toDateString()}</Table.Cell>
             </Table.Row>
           ))
         ) : (

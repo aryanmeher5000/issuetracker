@@ -10,10 +10,17 @@ import Pagination from "./_components/Pagination";
 const IssuePage = async ({
   searchParams,
 }: {
-  searchParams: { status: string; orderBy: string; order: string };
+  searchParams: {
+    status: string;
+    orderBy: string;
+    order: string;
+    page: string;
+  };
 }) => {
   // Construct the orderBy object dynamically
-  const { status, orderBy, order } = await searchParams;
+  const { status, orderBy, order, page } = await searchParams;
+  const pageParsed = parseInt(page) || 1;
+  const pageSize = 10;
 
   const validStatus =
     status && Object.values(Status).includes(status as Status)
@@ -27,6 +34,11 @@ const IssuePage = async ({
           [orderBy]: order || "asc",
         }
       : undefined,
+    take: pageSize,
+    skip: (pageParsed - 1) * pageSize,
+  });
+  const count = await prisma.issue.count({
+    where: { status: validStatus },
   });
 
   return (
@@ -34,7 +46,11 @@ const IssuePage = async ({
       <IssuesToolbar />
       <Filters />
       <IssuesTable issues={issues} />
-      <Pagination />
+      <Pagination
+        itemCount={count}
+        pageSize={pageSize}
+        currentPage={pageParsed}
+      />
     </Box>
   );
 };
