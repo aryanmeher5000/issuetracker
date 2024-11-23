@@ -8,10 +8,20 @@ import { auth } from "@/app/api/auth/auth";
 import AssignIssue from "./AssignIssue";
 import ReopenIssueButton from "./ReopenIssueButton";
 import { Metadata } from "next";
+import { cache } from "react";
 
 interface Props {
   params: { id: string };
 }
+
+const fetchUser = cache((issueId: number) => {
+  return prisma.issue.findUnique({
+    where: { id: issueId },
+    include: {
+      assignedToUser: true,
+    },
+  });
+});
 
 const IssueDetailPage = async ({ params }: Props) => {
   // Authenticate the user.
@@ -21,12 +31,7 @@ const IssueDetailPage = async ({ params }: Props) => {
   const issueId = parseInt(id, 10);
 
   // Fetch issue details from the database.
-  const issueDetail = await prisma.issue.findUnique({
-    where: { id: issueId },
-    include: {
-      assignedToUser: true,
-    },
-  });
+  const issueDetail = await fetchUser(issueId);
 
   // If issue not found, return 404.
   if (!issueDetail) {
@@ -88,9 +93,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = params;
   const issueId = parseInt(id, 10);
 
-  const issue = await prisma.issue.findUnique({
-    where: { id: issueId },
-  });
+  const issue = await fetchUser(issueId);
 
   return {
     title: issue?.title || "Issue Details",
