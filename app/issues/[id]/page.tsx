@@ -38,7 +38,6 @@ const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
         <Flex direction="column" gap="2">
           {issueDetail.status !== "CLOSED" ? (
             <>
-              {" "}
               {session.user.role === "ADMIN" && (
                 <AssignIssue
                   id={issueId}

@@ -18,7 +18,8 @@ const IssueDetail = ({ issue }: { issue: Issue }) => {
           <Text weight="medium" size="2">
             Deadline: {issue.deadline?.toLocaleDateString()}
           </Text>
-        ) : issue.status === "CLOSED" ? (
+        ) : null}
+        {issue.status === "CLOSED" ? (
           <Text weight="medium" size="2">
             Closed: {issue.updatedAt.toLocaleDateString()}
           </Text>

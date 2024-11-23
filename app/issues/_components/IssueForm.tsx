@@ -60,7 +60,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
 
       updIssue.mutate({ data: updatedFields, id: issue.id });
     } else {
-      crtIssue.mutate(data);
+      crtIssue.mutate(data as CreateIssueSchema);
     }
   };
 
@@ -116,14 +116,18 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           </Box>
         )}
         {/*Set deadline optional*/}
-        <Flex align="center" gap="2">
-          <Text>Deadline:</Text>
-          <TextField.Root
-            type="date"
-            {...register("deadline", { valueAsDate: true })}
-          />
-        </Flex>
-        <Error>{errors.deadline?.message}</Error>
+        {issue && (
+          <>
+            <Flex align="center" gap="2">
+              <Text>Deadline:</Text>
+              <TextField.Root
+                type="date"
+                {...register("deadline", { valueAsDate: true })}
+              />
+            </Flex>
+            <Error>{errors.deadline?.message}</Error>
+          </>
+        )}
 
         {/* Submit Button */}
         <Button type="submit" disabled={isLoading || !isDirty}>
