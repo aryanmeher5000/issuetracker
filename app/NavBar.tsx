@@ -89,7 +89,7 @@ const RenderAuth = () => {
       <Box>
         {status === "unauthenticated" && (
           <Button color="blue">
-            <Link href="/api/auth/signin">Signup</Link>
+            <Link href="/api/auth/signin">Signup/Login</Link>
           </Button>
         )}
       </Box>
@@ -107,11 +107,11 @@ const RenderAuth = () => {
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
               <DropdownMenu.Label>
-                <Text weight="bold" size="3">
+                <Text weight="bold" size="3" color="gray">
                   {session.user?.email}
                 </Text>
               </DropdownMenu.Label>
-              <DropdownMenu.Item>
+              <DropdownMenu.Item color="red">
                 <Link href="/api/auth/signout">Signout</Link>
               </DropdownMenu.Item>
             </DropdownMenu.Content>
