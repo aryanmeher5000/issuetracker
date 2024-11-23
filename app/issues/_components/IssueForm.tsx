@@ -2,7 +2,15 @@
 import { createIssueSchema, updateIssueSchema } from "@/app/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Issue, Status } from "@prisma/client";
-import { Box, Button, Select, Spinner, TextField } from "@radix-ui/themes";
+import {
+  Text,
+  Box,
+  Button,
+  Select,
+  Spinner,
+  TextField,
+  Flex,
+} from "@radix-ui/themes";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import "easymde/dist/easymde.min.css";
@@ -39,6 +47,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   const updIssue = useUpdateIssue();
   const isLoading = crtIssue.isPending || updIssue.isPending;
   const onSubmit = async (data: FormData) => {
+    console.log(data);
     if (issue) {
       const updatedFields = {};
 
@@ -106,6 +115,15 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
             />
           </Box>
         )}
+        {/*Set deadline optional*/}
+        <Flex align="center" gap="2">
+          <Text>Deadline:</Text>
+          <TextField.Root
+            type="date"
+            {...register("deadline", { valueAsDate: true })}
+          />
+        </Flex>
+        <Error>{errors.deadline?.message}</Error>
 
         {/* Submit Button */}
         <Button type="submit" disabled={isLoading || !isDirty}>

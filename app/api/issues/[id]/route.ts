@@ -68,6 +68,7 @@ export async function POST(
   }
 }
 
+//Update details of an issue
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -108,7 +109,9 @@ export async function PATCH(
   }
 
   // Verify updated details
+  body.deadline = new Date(body.deadline);
   const valid = updateIssueSchema.safeParse(body);
+  console.log(valid.error?.message);
   if (!valid.success) {
     return NextResponse.json(
       { error: "The form dosent satisfy the required constraints!" },

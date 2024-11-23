@@ -3,6 +3,7 @@ import { z } from "zod";
 export const createIssueSchema = z.object({
   title: z.string().min(3).max(250, "Title is too long."),
   description: z.string().min(3).max(500, "Description is too long."),
+  deadline: z.date().optional().nullable(),
 });
 
 export const updateIssueSchema = z.object({
@@ -14,4 +15,5 @@ export const updateIssueSchema = z.object({
     .optional()
     .nullable(),
   status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]).optional().nullable(),
+  deadline: z.date().optional().nullable(),
 });

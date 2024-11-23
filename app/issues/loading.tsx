@@ -1,6 +1,6 @@
 import React from "react";
 import IssueTableSkeleton from "../components/IssueTableSkeleton";
-import { Box, Skeleton } from "@radix-ui/themes";
+import { Box, Flex, Skeleton } from "@radix-ui/themes";
 
 const loading = () => {
   return (
@@ -8,6 +8,9 @@ const loading = () => {
       <Skeleton width="100px" height="30px" />
       <Skeleton width="100px" height="30px" />
       <IssueTableSkeleton />
+      <Flex justify="center">
+        <Skeleton width="250px" height="30px" />
+      </Flex>
     </Box>
   );
 };

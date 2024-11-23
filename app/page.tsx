@@ -1,6 +1,6 @@
 import { Flex, Heading, Text } from "@radix-ui/themes";
 import { IoIosBug } from "react-icons/io";
-import { SiTheboringcompany } from "react-icons/si";
+import { SiSolus } from "react-icons/si";
 
 export default function Home() {
   return (
@@ -16,17 +16,15 @@ export default function Home() {
         place. The platform offers customizable workflows, allowing you to
         tailor statuses and priorities to fit your specific needs. Collaboration
         is seamless with features like task assignments, comments, and real-time
-        notifications to keep everyone on the same page. Gain valuable insights
-        into your progress through detailed analytics and reporting tools,
-        helping you make informed decisions. Built with security and reliability
-        in mind, our issue tracker scales effortlessly to accommodate teams of
-        any size. Experience a streamlined workflow and enhanced productivity
-        today!
+        notifications to keep everyone on the same page. Built with security and
+        reliability in mind, our issue tracker scales effortlessly to
+        accommodate teams of any size. Experience a streamlined workflow and
+        enhanced productivity today!
       </Text>
 
-      <Flex direction="column" align="center">
+      <Flex direction="column" align="center" gap="2">
         <Text weight="bold">Trusted by</Text>
-        <SiTheboringcompany fontSize="20vh" />
+        <SiSolus fontSize="12vh" />
       </Flex>
     </Flex>
   );

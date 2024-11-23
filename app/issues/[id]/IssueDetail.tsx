@@ -6,12 +6,23 @@ import ReactMarkdown from "react-markdown";
 
 const IssueDetail = ({ issue }: { issue: Issue }) => {
   return (
-    <Box>
+    <Box className="space-y-4">
       <Heading className="mb-4">{issue.title}</Heading>
 
-      <Flex gap="3" align="center" className="mb-4">
+      <Flex gap="3" align="center">
         <Badge status={issue.status} />
-        <Text>{issue.createdAt.toDateString()}</Text>
+        <Text weight="medium" size="2">
+          Created: {issue.createdAt.toLocaleDateString()}
+        </Text>
+        {issue.deadline ? (
+          <Text weight="medium" size="2">
+            Deadline: {issue.deadline?.toLocaleDateString()}
+          </Text>
+        ) : issue.status === "CLOSED" ? (
+          <Text weight="medium" size="2">
+            Closed: {issue.updatedAt.toLocaleDateString()}
+          </Text>
+        ) : null}
       </Flex>
 
       <Card className="prose max-w-full">
