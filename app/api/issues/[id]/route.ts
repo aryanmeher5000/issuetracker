@@ -98,7 +98,7 @@ export async function PATCH(
   }
 
   // Verify updated details
-  body.deadline = new Date(body.deadline);
+  if (body.deadline) body.deadline = new Date(body.deadline);
   const valid = updateIssueSchema.safeParse(body);
   if (!valid.success) {
     return NextResponse.json(

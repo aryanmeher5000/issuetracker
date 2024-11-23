@@ -89,8 +89,8 @@ function useAssignIssue() {
       });
       return res.data;
     },
-    onSuccess: ({ msg }: { msg: string }) => {
-      toast.success(msg);
+    onSuccess: ({ message }: { message: string }) => {
+      toast.success(message);
     },
     onError: (err: AxiosError<{ error: string }>) => {
       toast.error(err.response?.data?.error || "Failed to update assignment.");

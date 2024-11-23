@@ -4,6 +4,7 @@ import { auth } from "../api/auth/auth";
 import IssuesTable from "../components/IssuesTable";
 import Filters from "../components/Filters";
 import { Status } from "@prisma/client";
+import { Metadata } from "next";
 
 const DelegatedIssues = async ({
   searchParams,
@@ -43,4 +44,9 @@ const DelegatedIssues = async ({
   );
 };
 
+export const metadata: Metadata = {
+  title: "Issue Tracker - Delegated",
+  description:
+    "View the issues delegated to you. Filter them by status and name and date of creation.",
+};
 export default DelegatedIssues;

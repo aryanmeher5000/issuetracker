@@ -1,4 +1,5 @@
 import { Flex, Heading, Text } from "@radix-ui/themes";
+import { Metadata } from "next";
 import { IoIosBug } from "react-icons/io";
 import { SiSolus } from "react-icons/si";
 
@@ -29,3 +30,9 @@ export default function Home() {
     </Flex>
   );
 }
+
+export const metadata: Metadata = {
+  title: "Issue Tracker - Home",
+  description:
+    "Track the issues in you personal project or team. The most easy and scalable app available out there.",
+};

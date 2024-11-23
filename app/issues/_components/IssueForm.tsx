@@ -40,7 +40,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     control,
     formState: { errors, isDirty },
   } = useForm<FormData>({
-    defaultValues: issue,
+    defaultValues: { ...issue, deadline: issue?.deadline || undefined },
     resolver: zodResolver(schema), // Correct schema
   });
 
