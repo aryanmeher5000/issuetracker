@@ -5,6 +5,7 @@ import IssuesToolbar from "./IssuesToolbar";
 import IssuesTable from "../components/IssuesTable";
 import Filters from "../components/Filters";
 import { Status } from "@prisma/client";
+import Pagination from "./_components/Pagination";
 
 const IssuePage = async ({
   searchParams,
@@ -33,6 +34,7 @@ const IssuePage = async ({
       <IssuesToolbar />
       <Filters />
       <IssuesTable issues={issues} />
+      <Pagination />
     </Box>
   );
 };
