@@ -20,6 +20,7 @@ import { Controller, useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
 import { Error } from "../../components";
+import { useSession } from "next-auth/react";
 const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -43,6 +44,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     resolver: zodResolver(schema), // Correct schema
   });
 
+  const { data } = useSession();
   const crtIssue = useCreateIssue();
   const updIssue = useUpdateIssue();
   const isLoading = crtIssue.isPending || updIssue.isPending;
@@ -116,7 +118,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           </Box>
         )}
         {/*Set deadline optional*/}
-        {issue && (
+        {issue && data?.user.role === "ADMIN" && (
           <>
             <Flex align="center" gap="2">
               <Text>Deadline:</Text>

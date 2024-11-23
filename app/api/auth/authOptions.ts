@@ -7,28 +7,31 @@ const authOptions: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
   providers: [
     Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
-      // Add role to the JWT token during login
-      if (user) {
+      if (user?.email) {
         const dbUser = await prisma.user.findUnique({
-          where: { email: user.email! },
+          where: { email: user.email },
         });
 
         if (dbUser) {
-          token.role = dbUser.role; // Assuming 'role' is in your User model
+          return {
+            ...token,
+            role: dbUser.role,
+            id: dbUser.id,
+          };
         }
       }
       return token;
     },
     async session({ session, token }) {
-      // Propagate role from JWT token to session object
-      if (token.role) {
+      if (token.role && session.user) {
         session.user.role = token.role;
+        session.user.id = token.id;
       }
       return session;
     },

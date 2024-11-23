@@ -11,6 +11,7 @@ import ReopenIssueButton from "./ReopenIssueButton";
 const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
   // Authenticate the user.
   const session = await auth();
+  console.log(session);
   const { id } = await params;
 
   const issueId = parseInt(id); // Parse `id` synchronously.
@@ -44,7 +45,10 @@ const IssueDetailPage = async ({ params }: { params: { id: string } }) => {
                   assignee={issueDetail.assignedToUser!}
                 />
               )}
-              <EditIssueButton issueId={issueDetail.id} />
+              {(session.user.id === issueDetail.assignedToUserId ||
+                session.user.role === "ADMIN") && (
+                <EditIssueButton issueId={issueDetail.id} />
+              )}
             </>
           ) : (
             <ReopenIssueButton id={issueId} />
