@@ -9,12 +9,12 @@ import { Metadata } from "next";
 const DelegatedIssues = async ({
   searchParams,
 }: {
-  searchParams: { status: string; orderBy: string; order: string };
+  searchParams: Promise<{ status: string; orderBy: string; order: string }>; // Make it a Promise
 }) => {
   // Authenticate the user
   const session = await auth();
 
-  // Construct the filter query dynamically
+  // Resolve the searchParams Promise
   const { status, orderBy, order } = await searchParams;
 
   const validStatus =
@@ -49,4 +49,5 @@ export const metadata: Metadata = {
   description:
     "View the issues delegated to you. Filter them by status and name and date of creation.",
 };
+
 export default DelegatedIssues;

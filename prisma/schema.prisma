@@ -10,8 +10,9 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 enum Status {
@@ -75,7 +76,6 @@ model User {
   image          String?
   accounts       Account[]
   sessions       Session[]
-  role           Role      @default(USER)
   assignedIssues Issue[]
 
   @@map("users")

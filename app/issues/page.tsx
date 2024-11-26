@@ -11,12 +11,12 @@ import { Metadata } from "next";
 const IssuePage = async ({
   searchParams,
 }: {
-  searchParams: {
+  searchParams: Promise<{
     status: string;
     orderBy: string;
     order: string;
     page: string;
-  };
+  }>;
 }) => {
   // Construct the orderBy object dynamically
   const { status, orderBy, order, page } = await searchParams;

@@ -11,7 +11,7 @@ import { Metadata } from "next";
 import { cache } from "react";
 
 interface Props {
-  params: { id: string };
+  id: string;
 }
 
 const fetchUser = cache((issueId: number) => {
@@ -23,7 +23,7 @@ const fetchUser = cache((issueId: number) => {
   });
 });
 
-const IssueDetailPage = async ({ params }: Props) => {
+const IssueDetailPage = async ({ params }: { params: Promise<Props> }) => {
   // Authenticate the user.
   const session = await auth();
   const { id } = await params;
@@ -89,8 +89,12 @@ const IssueDetailPage = async ({ params }: Props) => {
 };
 
 // Metadata generation for the page
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { id } = params;
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Props>;
+}): Promise<Metadata> {
+  const { id } = await params;
   const issueId = parseInt(id, 10);
 
   const issue = await fetchUser(issueId);

@@ -1,8 +1,8 @@
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "@/prisma/client";
 import { NextAuthConfig } from "next-auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 
 const authOptions: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
@@ -16,31 +16,6 @@ const authOptions: NextAuthConfig = {
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
     }),
   ],
-  callbacks: {
-    async jwt({ token, user }) {
-      if (user?.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: user.email },
-        });
-
-        if (dbUser) {
-          return {
-            ...token,
-            role: dbUser.role,
-            id: dbUser.id,
-          };
-        }
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (token.role && session.user) {
-        session.user.role = token.role;
-        session.user.id = token.id;
-      }
-      return session;
-    },
-  },
   session: { strategy: "jwt" },
 };
 
