@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
 import { z } from "zod";
-import { Error } from "../../components";
+import { Error } from "../../../components";
 import { useSession } from "next-auth/react";
 const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,

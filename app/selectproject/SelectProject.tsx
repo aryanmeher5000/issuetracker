@@ -1,10 +1,8 @@
 "use client";
 import { Project } from "@prisma/client";
 import { Flex, Heading, Table, Text, Button, Grid } from "@radix-ui/themes";
-import useProject from "../store";
 import { useRouter } from "next/navigation";
 import UserAvatar from "../components/UserAvatar";
-import { useSession } from "next-auth/react";
 
 const SelectProject = ({ projects }: { projects: Project[] }) => {
   // Filter projects based on type
@@ -59,13 +57,8 @@ function RenderTable({
   title: string;
   projects: Project[];
 }) {
-  const { data } = useSession();
-  const { setProjectInfo } = useProject();
   const { push } = useRouter();
-  function handleClick(project: Project) {
-    setProjectInfo(data?.user?.email, project);
-    push("/project");
-  }
+
   return (
     <Flex direction="column" gap="3" align="center">
       <Heading as="h6">{title}</Heading>
@@ -76,7 +69,7 @@ function RenderTable({
               style={{ minWidth: "100%" }}
               key={project.id}
               className="hover:bg-gray-200 cursor-pointer"
-              onClick={() => handleClick(project)}
+              onClick={() => push("/project/" + project.id)}
             >
               <Table.Cell className="text-center">
                 <Text>{project.name}</Text>

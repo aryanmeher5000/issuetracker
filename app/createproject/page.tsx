@@ -52,10 +52,7 @@ const CreateNewProject = () => {
                 value={field.value!} // Bind the value from react-hook-form
                 onValueChange={(value) => field.onChange(value)}
               >
-                <Select.Trigger
-                  placeholder="Update status of issue"
-                  style={{ width: "100%" }}
-                />
+                <Select.Trigger placeholder="Project Type" />
                 <Select.Content>
                   {Object.entries(ProjectType).map(([key, label]) => (
                     <Select.Item key={key} value={key}>

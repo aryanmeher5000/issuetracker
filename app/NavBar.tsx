@@ -1,6 +1,5 @@
 "use client";
 import {
-  Avatar,
   Box,
   Button,
   Container,
@@ -14,6 +13,8 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IoIosBug } from "react-icons/io";
+import UserAvatar from "./components/UserAvatar";
+import useProject from "./store";
 
 const NavBar = () => {
   return (
@@ -29,35 +30,42 @@ const NavBar = () => {
 };
 
 const RenderLinks = () => {
-  const session = useSession();
+  const {
+    project: { type },
+  } = useProject();
   const links = [
     {
+      name: "Project",
+      href: "/project",
+      condition: true,
+    },
+    {
       name: "Dashboard",
-      href: "/dashboard",
-      authenticated: true,
+      href: "/project/dashboard",
+      condition: true,
     },
     {
       name: "Issues",
-      href: "/issues",
-      authenticated: true,
+      href: "/project/issues",
+      condition: true,
     },
     {
-      name: "Delegated",
-      href: "/delegated",
-      authenticated: session && session.status === "authenticated",
+      name: type === "GROUP" ? "Pledged" : "Delegated",
+      href: "/project/delegated",
+      condition: type !== "PERSONAL",
     },
   ];
   const currentPath = usePathname();
 
   return (
-    <Flex gap="6" className="font-medium">
+    <Flex gap="4" className="font-medium">
       <Link href="/">
         <IoIosBug className="size-6 text-zinc-800" />
       </Link>
       <ul className="flex gap-4">
         {links.map(
           (k) =>
-            k.authenticated && (
+            k.condition && (
               <li
                 key={k.name}
                 className={classNames({
@@ -83,7 +91,7 @@ const RenderAuth = () => {
     <Box>
       <Box>
         {status === "loading" && (
-          <Skeleton height="25px" width="70px"></Skeleton>
+          <Skeleton height="50px" width="50px"></Skeleton>
         )}
       </Box>
       <Box>
@@ -97,13 +105,7 @@ const RenderAuth = () => {
         {status === "authenticated" && (
           <DropdownMenu.Root>
             <DropdownMenu.Trigger>
-              <Avatar
-                src={session.user!.image!}
-                fallback={session.user!.name![0]}
-                radius="full"
-                className="cursor-pointer"
-                referrerPolicy="no-referrer"
-              />
+              <UserAvatar size="4" />
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
               <DropdownMenu.Label>

@@ -1,5 +1,5 @@
 import React from "react";
-import IssueTableSkeleton from "../components/IssueTableSkeleton";
+import IssueTableSkeleton from "../../components/IssueTableSkeleton";
 import { Box, Flex, Skeleton } from "@radix-ui/themes";
 
 const loading = () => {
