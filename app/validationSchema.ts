@@ -1,5 +1,13 @@
 import { z } from "zod";
 
+export const createProjectScehma = z.object({
+  name: z.string().min(3).max(50),
+  type: z.enum(["PERSONAL", "GROUP", "ORGANIZATION"]),
+  admins: z.array(z.string()).optional(),
+  members: z.array(z.string()).optional(),
+});
+export type CreateProject = z.infer<typeof createProjectScehma>;
+
 export const createIssueSchema = z.object({
   title: z.string().min(3).max(250, "Title is too long."),
   description: z.string().min(3).max(500, "Description is too long."),

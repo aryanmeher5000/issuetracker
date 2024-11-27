@@ -1,17 +1,19 @@
+import { Project } from "@prisma/client";
 import { create } from "zustand";
 
-interface Project {
+interface ProjectStore {
   isAdmin: boolean;
-  name: string | undefined;
-  type: "personal" | "group" | "admin-user" | undefined;
-  setProjectInfo: (data: Project) => void;
+  project: { id: number; name: string; type: string };
+  setProjectInfo: (userEmail: string, data: Project) => void;
 }
 
-const useGetProjectDetails = create<Project>((set) => ({
+const useProject = create<ProjectStore>((set) => ({
   isAdmin: false,
-  name: undefined,
-  type: undefined,
-  setProjectInfo: (data: Project) => set(data),
+  project: undefined,
+  setProjectInfo: (userEmail: string, data: Project) => {
+    if (data.admins.includes(userEmail)) set({ isAdmin: true });
+    set({ project: { id: data.id, name: data.name, type: data.type } });
+  },
 }));
 
-export default useGetProjectDetails;
+export default useProject;

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import "@radix-ui/themes/styles.css";
-import NavBar from "./NavBar";
 import { Container, Theme } from "@radix-ui/themes";
 import AuthProvider from "./api/auth/Provider";
 import QueryClientProvider from "./QueryClientProvider";
@@ -36,7 +35,6 @@ export default function RootLayout({
         <QueryClientProvider>
           <AuthProvider>
             <Theme appearance="light" accentColor="violet">
-              <NavBar />
               <main>
                 <Container>{children}</Container>
               </main>

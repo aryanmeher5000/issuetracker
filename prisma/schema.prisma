@@ -71,38 +71,25 @@ enum Role {
 }
 
 model User {
-  id             String          @id @default(cuid())
+  id             String    @id @default(cuid())
   name           String?
-  email          String?         @unique
-  emailVerified  DateTime?       @map("email_verified")
+  email          String?   @unique
+  emailVerified  DateTime? @map("email_verified")
   image          String?
   accounts       Account[]
   sessions       Session[]
   assignedIssues Issue[]
-  ProjectMember  ProjectMember[]
 
   @@map("users")
 }
 
-model ProjectMember {
-  id        Int    @id @default(autoincrement())
-  userId    String
-  projectId Int
-  role      Role
-
-  user    User    @relation(fields: [userId], references: [id])
-  project Project @relation(fields: [projectId], references: [id])
-
-  @@unique([userId, projectId])
-}
-
 model Project {
-  id      Int             @id @default(autoincrement())
-  name    String
-  type    ProjectType
-  issues  Issue[]
-  members ProjectMember[]
-  tags    String[]
+  id     Int         @id @default(autoincrement())
+  name   String
+  type   ProjectType
+  issues Issue[]
+  admins String[]
+  users  String[]
 
   @@map("projects")
 }
