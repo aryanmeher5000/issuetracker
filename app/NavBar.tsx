@@ -1,13 +1,5 @@
 "use client";
-import {
-  Box,
-  Button,
-  Container,
-  DropdownMenu,
-  Flex,
-  Skeleton,
-  Text,
-} from "@radix-ui/themes";
+import { Box, Button, DropdownMenu, Flex, Text } from "@radix-ui/themes";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
@@ -20,12 +12,10 @@ import NavbarSkeleton from "./NavbarSkeleton";
 const NavBar = () => {
   return (
     <nav className="flex gap-4 border-b mb-5 px-4 h-14 items-center">
-      <Container>
-        <Flex justify="between" align="center" py="20px">
-          <RenderLinks />
-          <RenderAuth />
-        </Flex>
-      </Container>
+      <Flex justify="between" align="center" py="20px" width="100%">
+        <RenderLinks />
+        <RenderAuth />
+      </Flex>
     </nav>
   );
 };
@@ -52,7 +42,7 @@ const RenderLinks = () => {
     },
     {
       name: project?.type === "GROUP" ? "Pledged" : "Delegated",
-      href: "/project/delegated",
+      href: "/project/userIssues",
       condition: project?.type !== "PERSONAL",
     },
   ];
@@ -89,11 +79,6 @@ const RenderAuth = () => {
 
   return (
     <Box>
-      <Box>
-        {status === "loading" && (
-          <Skeleton height="50px" width="50px"></Skeleton>
-        )}
-      </Box>
       <Box>
         {status === "unauthenticated" && (
           <Button color="blue">
