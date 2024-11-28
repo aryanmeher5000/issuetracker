@@ -19,8 +19,8 @@ const IssueDetail = ({ issue }: { issue: Issue }) => {
   } = issue;
 
   return (
-    <Box className="space-y-6">
-      <Heading className="mb-4">{title}</Heading>
+    <Box className="space-y-4">
+      <Heading>{title}</Heading>
 
       <Flex gap="3" align="center">
         <Badge status={status} />
@@ -31,29 +31,32 @@ const IssueDetail = ({ issue }: { issue: Issue }) => {
         <ReactMarkdown>{description}</ReactMarkdown>
       </Card>
 
-      <Flex direction="column" gap="6" className="timeline">
-        <Heading size="4" weight="bold">
-          Timeline
-        </Heading>
-        <TimelineItem
-          color="#FF6961"
-          icon={<VscFolderOpened color="white" fontSize="1.5rem" />}
-          label="Opened On"
-          date={createdAt}
-        />
-        <TimelineItem
-          color="#CF9FFF"
-          icon={<GrInProgress color="white" fontSize="1.5rem" />}
-          label="In Progress"
-          date={inProgression}
-        />
-        <TimelineItem
-          color="#90ee90"
-          icon={<FaRegFolderClosed color="white" fontSize="1.5rem" />}
-          label="Closed On"
-          date={status === "CLOSED" ? updatedAt : undefined}
-        />
-      </Flex>
+      <Card className="lg:w-6/12">
+        <Flex direction={{ initial: "column" }} gap="6" className="timeline">
+          <Heading size="4" weight="bold">
+            Timeline
+          </Heading>
+
+          <TimelineItem
+            color="#FF6961"
+            icon={<VscFolderOpened color="white" fontSize="1.5rem" />}
+            label="Opened On"
+            date={createdAt}
+          />
+          <TimelineItem
+            color="#CF9FFF"
+            icon={<GrInProgress color="white" fontSize="1.5rem" />}
+            label="In Progress"
+            date={inProgression}
+          />
+          <TimelineItem
+            color="#90ee90"
+            icon={<FaRegFolderClosed color="white" fontSize="1.5rem" />}
+            label="Closed On"
+            date={status === "CLOSED" ? updatedAt : undefined}
+          />
+        </Flex>
+      </Card>
     </Box>
   );
 };

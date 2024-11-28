@@ -5,12 +5,18 @@ import IssueSummary from "./IssueSummary";
 import prisma from "@/prisma/client";
 import IssueChart from "./IssueChart";
 import { Metadata } from "next";
+import { getProjectId } from "../../lib/getProjectId";
 
 const Dashboard = async () => {
-  const open = await prisma.issue.count({ where: { status: "OPEN" } });
-  const closed = await prisma.issue.count({ where: { status: "CLOSED" } });
+  const projectId = await getProjectId();
+  const open = await prisma.issue.count({
+    where: { projectId: projectId, status: "OPEN" },
+  });
+  const closed = await prisma.issue.count({
+    where: { projectId: projectId, status: "CLOSED" },
+  });
   const inProgress = await prisma.issue.count({
-    where: { status: "IN_PROGRESS" },
+    where: { projectId: projectId, status: "IN_PROGRESS" },
   });
   return (
     <Grid columns={{ initial: "1", md: "2" }} gap="5" p="4">

@@ -47,7 +47,6 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   const updIssue = useUpdateIssue();
   const isLoading = crtIssue.isPending || updIssue.isPending;
   const onSubmit = async (data: FormData) => {
-    console.log(data);
     if (issue) {
       const updatedFields = {};
 
@@ -72,7 +71,6 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           {...register("title")}
         ></TextField.Root>
         <Error>{errors.title?.message}</Error>
-
         <Controller
           name="description"
           control={control}
@@ -87,52 +85,33 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         />
         <Error>{errors.description?.message}</Error>
 
+        {/*Set deadline optional*/}
+        <Flex align="center" gap="2">
+          <Text>Deadline:</Text>
+          <TextField.Root
+            type="date"
+            {...register("deadline", { valueAsDate: true })}
+          />
+        </Flex>
+        <Error>{errors.deadline?.message}</Error>
+
         {/*Update status of issue*/}
         {issue && (
-          <Box>
-            <Controller
-              name="status"
-              control={control}
-              defaultValue={issue.status}
-              render={({ field }) => (
-                <Select.Root
-                  value={field.value!} // Bind the value from react-hook-form
-                  onValueChange={(value) => field.onChange(value)} // Use onValueChange for updates
-                >
-                  <Select.Trigger
-                    placeholder="Update status of issue"
-                    style={{ width: "140px" }}
-                  />
-                  <Select.Content>
-                    {Object.entries(Status).map(([key, label]) => (
-                      <Select.Item key={key} value={key}>
-                        {label}
-                      </Select.Item>
-                    ))}
-                  </Select.Content>
-                </Select.Root>
-              )}
-            />
-          </Box>
-        )}
-
-        {/*Set priority*/}
-        <Box>
           <Controller
-            name="priority"
+            name="status"
             control={control}
-            defaultValue={issue?.priority}
+            defaultValue={issue.status}
             render={({ field }) => (
               <Select.Root
                 value={field.value!} // Bind the value from react-hook-form
-                onValueChange={(value) => field.onChange(value)} // Use onValueChange for updates
+                onValueChange={(value) => field.onChange(value)} // Use onValueChange for update
               >
                 <Select.Trigger
-                  placeholder="Set priority"
-                  style={{ width: "140px" }}
+                  placeholder="Update status of issue"
+                  style={{ width: "140px", marginRight: "4px" }}
                 />
                 <Select.Content>
-                  {Object.entries(Priority).map(([key, label]) => (
+                  {Object.entries(Status).map(([key, label]) => (
                     <Select.Item key={key} value={key}>
                       {label}
                     </Select.Item>
@@ -141,27 +120,39 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
               </Select.Root>
             )}
           />
-        </Box>
-
-        {/*Set deadline optional*/}
-        {/*  (
-          <>
-            <Flex align="center" gap="2">
-              <Text>Deadline:</Text>
-              <TextField.Root
-                type="date"
-                {...register("deadline", { valueAsDate: true })}
+        )}
+        {/*Set priority*/}
+        <Controller
+          name="priority"
+          control={control}
+          defaultValue={issue?.priority}
+          render={({ field }) => (
+            <Select.Root
+              value={field.value!} // Bind the value from react-hook-form
+              onValueChange={(value) => field.onChange(value)} // Use onValueChange for updates
+            >
+              <Select.Trigger
+                placeholder="Set priority"
+                style={{ width: "140px" }}
               />
-            </Flex>
-            <Error>{errors.deadline?.message}</Error>
-          </>
-        )} */}
+              <Select.Content>
+                {Object.entries(Priority).map(([key, label]) => (
+                  <Select.Item key={key} value={key}>
+                    {label}
+                  </Select.Item>
+                ))}
+              </Select.Content>
+            </Select.Root>
+          )}
+        />
 
         {/* Submit Button */}
-        <Button type="submit" disabled={isLoading || !isValid || !isDirty}>
-          {issue ? "Update This Issue" : "Submit New Issue"}{" "}
-          {isLoading && <Spinner />}
-        </Button>
+        <Box>
+          <Button type="submit" disabled={isLoading || !isValid || !isDirty}>
+            {issue ? "Update This Issue" : "Submit New Issue"}{" "}
+            {isLoading && <Spinner />}
+          </Button>
+        </Box>
       </form>
       <Toaster />
     </Box>

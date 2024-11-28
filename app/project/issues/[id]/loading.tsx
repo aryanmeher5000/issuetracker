@@ -11,6 +11,18 @@ const DetailPageLoading = () => {
           <Skeleton width="8rem" />
         </Flex>
 
+        <Card mb="4">
+          <Text>
+            <Skeleton />
+          </Text>
+          <Text>
+            <Skeleton />
+          </Text>
+          <Text>
+            <Skeleton />
+          </Text>
+        </Card>
+
         <Card>
           <Text>
             <Skeleton />
@@ -28,6 +40,7 @@ const DetailPageLoading = () => {
         <Skeleton height="30px" />
         <Skeleton height="30px" />
         <Skeleton height="30px" />
+        <Skeleton height="60px" />
       </Flex>
     </Grid>
   );

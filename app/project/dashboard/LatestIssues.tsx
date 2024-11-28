@@ -1,10 +1,14 @@
 import prisma from "@/prisma/client";
 import { Avatar, Card, Flex, Heading, Table } from "@radix-ui/themes";
-import { Badge } from "../components";
+import { Badge } from "../../components";
 import Link from "next/link";
+import { getProjectId } from "@/app/lib/getProjectId";
 
 const LatestIssues = async () => {
+  const projectId = await getProjectId();
+
   const issues = await prisma.issue.findMany({
+    where: { projectId: projectId },
     orderBy: { createdAt: "desc" },
     take: 5,
     include: { assignedToUser: true },
@@ -22,8 +26,13 @@ const LatestIssues = async () => {
               <Table.Cell>
                 <Flex justify="between" align="center">
                   <Flex direction="column" align="start" gap="2">
-                    <Link href={`/issues/${issue.id}`}>{issue.title}</Link>
-                    <Badge status={issue.status} />
+                    <Link href={`/project/issues/${issue.id}`}>
+                      {issue.title}
+                    </Link>
+                    <Flex gap="1">
+                      <Badge status={issue.status} />
+                      <Badge priority={issue.priority} />
+                    </Flex>
                   </Flex>
                   {issue.assignedToUser && (
                     <Avatar

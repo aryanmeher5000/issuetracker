@@ -10,8 +10,8 @@ interface Props {
 const IssueChart = ({ open, closed, inProgress }: Props) => {
   const data = [
     { label: "Open", value: open },
-    { label: "Closed", value: closed },
     { label: "In Progress", value: inProgress },
+    { label: "Closed", value: closed },
   ];
   return (
     <ResponsiveContainer width="100%" height={300}>

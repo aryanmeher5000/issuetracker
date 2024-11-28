@@ -26,6 +26,6 @@ export const updateIssueSchema = z
       .max(500, "Description is too long."),
     status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]),
     priority: z.enum(["HIGH", "MEDIUM", "LOW"]).optional(),
-    deadline: z.date(),
+    deadline: z.date().optional(),
   })
   .partial();

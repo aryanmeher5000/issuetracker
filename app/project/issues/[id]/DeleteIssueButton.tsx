@@ -1,35 +1,22 @@
 "use client";
 import { Spinner } from "@/app/components";
 import { AlertDialog, Button, Flex } from "@radix-ui/themes";
-import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
 import { MdDelete } from "react-icons/md";
 
 const DeleteIssueButton = ({ issueId }: { issueId: number }) => {
-  const router = useRouter();
-  const [err, setErr] = useState<boolean>(false);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  async function deleteIssue() {
-    try {
-      setIsSubmitting(true);
-      await axios.delete("/api/issues/" + issueId);
-      router.push("/issues");
-      router.refresh();
-    } catch (err) {
-      setIsSubmitting(false);
-      setErr(true);
-      console.log(err);
-    }
-  }
+  const { mutate, isPending, error, reset } = useDeleteIssue();
 
   return (
     <>
       <AlertDialog.Root>
         <AlertDialog.Trigger>
-          <Button color="red" disabled={isSubmitting}>
+          <Button color="red" disabled={isPending}>
             <MdDelete />
-            Delete Issue {isSubmitting && <Spinner />}
+            Delete Issue {isPending && <Spinner />}
           </Button>
         </AlertDialog.Trigger>
         <AlertDialog.Content maxWidth="450px">
@@ -46,7 +33,11 @@ const DeleteIssueButton = ({ issueId }: { issueId: number }) => {
               </Button>
             </AlertDialog.Cancel>
             <AlertDialog.Action>
-              <Button variant="solid" color="red" onClick={deleteIssue}>
+              <Button
+                variant="solid"
+                color="red"
+                onClick={() => mutate({ issueId })}
+              >
                 Delete Issue
               </Button>
             </AlertDialog.Action>
@@ -54,27 +45,49 @@ const DeleteIssueButton = ({ issueId }: { issueId: number }) => {
         </AlertDialog.Content>
       </AlertDialog.Root>
 
-      <AlertDialog.Root open={err}>
+      {/* Error Dialog */}
+      <AlertDialog.Root open={!!error}>
         <AlertDialog.Content maxWidth="450px">
           <AlertDialog.Title>Error Deleting</AlertDialog.Title>
           <AlertDialog.Description size="2">
-            An error occured while deleting this issue!
+            {error?.response?.data?.error ||
+              error?.message ||
+              "Error deleting issue."}
           </AlertDialog.Description>
 
           <AlertDialog.Cancel>
             <Button
               variant="soft"
-              color="red"
-              onClick={() => setErr(false)}
+              color="blue"
               mt="4"
+              onClick={() => reset()} // Close the dialog
             >
               Okay
             </Button>
           </AlertDialog.Cancel>
         </AlertDialog.Content>
       </AlertDialog.Root>
+
+      <Toaster />
     </>
   );
 };
 
+function useDeleteIssue() {
+  const { push } = useRouter();
+  return useMutation<
+    { message: string },
+    AxiosError<{ error: string }>,
+    { issueId: number }
+  >({
+    mutationFn: async ({ issueId }) => {
+      const resp = await axios.delete(`/api/issues/${issueId}`);
+      return resp.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Issue deleted successfully.");
+      push("/project/issues");
+    },
+  });
+}
 export default DeleteIssueButton;

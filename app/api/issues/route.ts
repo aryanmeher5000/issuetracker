@@ -17,6 +17,13 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
 
+  //Check if project present
+  if (!projectId)
+    return NextResponse.json(
+      { error: "Please select a project first!" },
+      { status: 403 }
+    );
+
   const valid = createIssueSchema.safeParse(body);
   if (!valid.success)
     return NextResponse.json(valid.error.format(), { status: 400 });

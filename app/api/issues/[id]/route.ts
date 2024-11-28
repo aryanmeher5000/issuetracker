@@ -2,62 +2,89 @@ import { updateIssueSchema } from "@/app/validationSchema";
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../../auth/auth";
-
-// Utility to safely parse and validate `id` parameters
-const parseIssueId = (id: string | undefined): number | null => {
-  const issueId = id ? parseInt(id, 10) : NaN;
-  return isNaN(issueId) ? null : issueId;
-};
+import { getProjectId } from "@/app/lib/getProjectId";
 
 // Assign issue to a user -- Only ADMIN
 export async function POST(
   request: NextRequest,
-  context: { params: Promise<{ id: string }> } // Ensure `params` is a Promise
+  context: { params: Promise<{ id: string }> }
 ) {
-  const body = await request.json();
-  const { id } = await context.params;
-
-  // Parse and validate issue ID
-  const issueId = parseInt(id, 10);
-  if (isNaN(issueId)) {
+  // Authenticate user
+  const session = await auth();
+  if (!session) {
     return NextResponse.json(
-      { error: "Invalid issue ID. It must be a number." },
+      { error: "Unauthorized. Please log in." },
+      { status: 401 }
+    );
+  }
+
+  // Extract and validate project
+  const projectId = await getProjectId(); // Replace with your implementation
+  if (!projectId) {
+    return NextResponse.json(
+      { error: "Project ID is missing or invalid." },
       { status: 400 }
     );
   }
 
-  // Check if assigner is an admin
-  const assigner = await auth();
-  if (!assigner || assigner.user.role !== "ADMIN") {
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+  });
+  if (!project) {
+    return NextResponse.json(
+      { error: "Project not found. Please select a valid project!" },
+      { status: 404 }
+    );
+  }
+
+  // Check admin authorization
+  if (!project.admins.includes(session.user.email)) {
     return NextResponse.json(
       { error: "Authorization denied! Only admins can perform this action." },
       { status: 403 }
     );
   }
 
-  // Validate userId from the body (if provided)
-  const userId = body.userId || null;
+  // Parse and validate issue ID
+  const { id: issueIdParam } = await context.params;
+  const issueId = parseInt(issueIdParam, 10);
+  if (isNaN(issueId)) {
+    return NextResponse.json(
+      { error: "Invalid issue ID. It must be a valid number." },
+      { status: 400 }
+    );
+  }
+
+  // Parse request body
+  const body = await request.json();
+  const assigneeEmail = body.userId;
   let assignee = null;
-  if (userId) {
-    assignee = await prisma.user.findUnique({ where: { id: userId } });
+  if (assigneeEmail !== "unassign") {
+    assignee = await prisma.user.findUnique({
+      where: { email: assigneeEmail },
+    });
     if (!assignee) {
-      return NextResponse.json({ error: `User not found.` }, { status: 404 });
+      return NextResponse.json(
+        { error: "Assignee not found. Please provide a valid email." },
+        { status: 404 }
+      );
     }
   }
 
-  // Assign or unassign the issue
+  // Update issue assignment
   const updatedIssue = await prisma.issue.update({
     where: { id: issueId },
-    data: { assignedToUserId: assignee?.id || null },
+    data: { assignedToUserId: assignee ? assigneeEmail : null },
   });
 
-  // Respond with success
+  // Success response
   return NextResponse.json(
     {
-      message: assignee
-        ? `Issue successfully assigned to ${assignee.name}.`
-        : "Issue successfully unassigned.",
-      issue: updatedIssue, // Optionally include the updated issue
+      message:
+        assigneeEmail !== "unassign"
+          ? `Issue successfully assigned to ${assignee.name}.`
+          : "Issue successfully unassigned.",
+      issue: updatedIssue,
     },
     { status: 200 }
   );
@@ -68,15 +95,7 @@ export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await context.params;
-  const issueId = parseIssueId(id);
-  if (!issueId) {
-    return NextResponse.json(
-      { error: "Invalid issue ID. It must be a number." },
-      { status: 400 }
-    );
-  }
-
+  // Authenticate the user
   const session = await auth();
   if (!session || !session.user) {
     return NextResponse.json(
@@ -85,41 +104,83 @@ export async function PATCH(
     );
   }
 
-  const issue = await prisma.issue.findUnique({ where: { id: issueId } });
+  // Verify the project exists
+  const projectId = await getProjectId(); // Replace with your actual implementation
+  if (!projectId) {
+    return NextResponse.json(
+      { error: "Project ID is missing or invalid." },
+      { status: 400 }
+    );
+  }
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+  });
+  if (!project) {
+    return NextResponse.json({ error: "Project not found!" }, { status: 404 });
+  }
+
+  // Verify the issue exists
+  const { id: issueIdParam } = await context.params;
+  const issueId = parseInt(issueIdParam, 10);
+  if (isNaN(issueId)) {
+    return NextResponse.json(
+      { error: "Invalid issue ID. It must be a number." },
+      { status: 400 }
+    );
+  }
+
+  const issue = await prisma.issue.findUnique({
+    where: { id: issueId },
+  });
   if (!issue) {
     return NextResponse.json({ error: "Issue not found!" }, { status: 404 });
   }
 
+  // Check if the user has permissions (admin or regular user of the project)
   if (
-    session.user.role !== "ADMIN" &&
-    session.user.id !== issue.assignedToUserId
+    !project.admins.includes(session.user.email) &&
+    !project.users.includes(session.user.email)
   ) {
     return NextResponse.json(
-      { error: "Authorization denied!" },
+      { error: "You are not authorized to perform this action!" },
       { status: 403 }
     );
   }
 
+  // Parse and validate the request body
   const body = await request.json();
   if (body.deadline) {
     body.deadline = new Date(body.deadline);
   }
 
-  const valid = updateIssueSchema.safeParse(body);
-  if (!valid.success) {
+  const validationResult = updateIssueSchema.safeParse(body);
+  if (!validationResult.success) {
     return NextResponse.json(
-      { error: "The form does not satisfy the required constraints!" },
+      { error: "The form does not satisfy the required constraints." },
       { status: 400 }
     );
   }
 
+  // Update the issue
+  const currDate = new Date(); // Current date for IN_PROGRESS
+
   const updatedIssue = await prisma.issue.update({
     where: { id: issueId },
-    data: valid.data,
+    data: {
+      ...validationResult.data, // Include other validated fields
+      inProgression:
+        validationResult.data?.status === "OPEN"
+          ? null // Set to null if status is OPEN
+          : validationResult.data?.status === "IN_PROGRESS"
+          ? currDate // Set to current date if status is IN_PROGRESS
+          : undefined, // No update if status is CLOSED or unchanged
+    },
   });
 
+  // Respond with the updated issue
   return NextResponse.json(
-    { message: "Issue updated.", issue: updatedIssue },
+    { message: "Issue updated successfully.", issue: updatedIssue },
     { status: 200 }
   );
 }
@@ -129,24 +190,33 @@ export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> } // Ensure `params` is a Promise
 ) {
-  const { id } = await context.params; // Await the Promise for `params`
-
+  //Check issueid
+  const { id } = await context.params;
   const issueId = parseInt(id, 10);
   if (isNaN(issueId)) {
-    return NextResponse.json(
-      { error: "Invalid issue ID. It must be a number." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid issue ID!" }, { status: 400 });
   }
-
+  //Check auth
   const session = await auth();
-  if (!session || session.user.role !== "ADMIN") {
+  if (!session || !session.user) {
     return NextResponse.json(
       { error: "Authorization denied!" },
       { status: 403 }
     );
   }
 
+  //chekc if project exists and isadmin
+  const projectId = await getProjectId();
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+  });
+  if (!project || !project.admins.includes(session.user.email))
+    return NextResponse.json(
+      { error: "Project not found please select a valid project!" },
+      { status: 404 }
+    );
+
+  //Check if issue exists
   const issueExists = await prisma.issue.findUnique({ where: { id: issueId } });
   if (!issueExists) {
     return NextResponse.json({ error: "Issue not found." }, { status: 404 });

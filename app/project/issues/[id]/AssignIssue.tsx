@@ -3,6 +3,7 @@ import { User } from "@prisma/client";
 import { Avatar, Box, Flex, Select, Skeleton, Text } from "@radix-ui/themes";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
 const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
@@ -12,40 +13,86 @@ const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
   if (isLoading) return <Skeleton height="30px" />;
 
   if (error) return <Text color="red">Failed to load users.</Text>;
-
   return (
     <Box height="30px">
       <Select.Root
-        defaultValue={assignee?.id}
+        defaultValue={assignee?.email}
         onValueChange={(e) => mutate({ issueId: id, userId: e })}
         disabled={isMutating}
       >
-        <Select.Trigger placeholder="Assign Issue" />
+        <Select.Trigger style={{ width: "100%" }} placeholder="Assign Issue" />
         <Select.Content>
+          {/* Unassign Option */}
           <Select.Item key="unassign" value="unassign">
             Unassign
           </Select.Item>
-          {data?.length ? (
-            data.map((k) => (
-              <Select.Item key={k.id} value={k.id}>
-                <Flex
-                  justify="start"
-                  align="center"
-                  height="fit-content"
-                  gap="2"
-                >
-                  <Avatar
-                    src={k.image!}
-                    fallback={k.name![0]}
-                    referrerPolicy="no-referrer"
-                    radius="full"
-                    size="1"
-                  />
-                  <Text>{k.name}</Text>
-                </Flex>
-              </Select.Item>
-            ))
-          ) : (
+
+          {data?.admins.length ? (
+            <>
+              <Select.Group>
+                <Select.Label>Admins</Select.Label>
+                {data.admins.map((admin) => (
+                  <Select.Item key={admin.email} value={admin.email}>
+                    <Flex
+                      justify="start"
+                      align="center"
+                      height="fit-content"
+                      gap="2"
+                    >
+                      <Avatar
+                        src={admin.image!}
+                        fallback={admin.name![0]}
+                        referrerPolicy="no-referrer"
+                        radius="full"
+                        size="1"
+                      />
+                      <Text>
+                        {admin.name.length > 25
+                          ? admin.name.slice(0, 25)
+                          : admin.name}
+                      </Text>
+                    </Flex>
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </>
+          ) : null}
+
+          {/* Users Section */}
+          {data?.users.length ? (
+            <>
+              <Select.Separator />
+              <Select.Group>
+                <Select.Label>Users</Select.Label>
+                {data.users.map((user) => (
+                  <Select.Item key={user.email} value={user.email}>
+                    <Flex
+                      justify="start"
+                      align="center"
+                      height="fit-content"
+                      gap="2"
+                    >
+                      <Avatar
+                        src={user.image!}
+                        fallback={user.name![0]}
+                        referrerPolicy="no-referrer"
+                        radius="full"
+                        size="1"
+                      />
+                      <Text>
+                        {user.name.length > 25
+                          ? user.name.slice(0, 25)
+                          : user.name}
+                      </Text>
+                    </Flex>
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </>
+          ) : null}
+
+          {/* No Users Available */}
+          {!data?.admins.length && !data?.users.length && (
             <Select.Item key="no-users" value="none" disabled>
               No users available
             </Select.Item>
@@ -60,7 +107,7 @@ const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
 
 // Fetch users
 function useGetUsers() {
-  return useQuery<User[], AxiosError>({
+  return useQuery<{ admins: User[]; users: User[] }, AxiosError>({
     queryKey: ["Users"],
     queryFn: async () => {
       const res = await axios.get("/api/users");
@@ -72,11 +119,9 @@ function useGetUsers() {
 }
 
 // Change assignee with toast notifications and refetch
-function useAssignIssue() {
+export function useAssignIssue() {
+  const { refresh } = useRouter();
   return useMutation({
-    onMutate: () => {
-      toast.loading("Assigning issue to user", { duration: 1 * 1000 });
-    },
     mutationFn: async ({
       issueId,
       userId,
@@ -84,13 +129,12 @@ function useAssignIssue() {
       issueId: number;
       userId?: string;
     }) => {
-      const res = await axios.post(`/api/issues/${issueId}`, {
-        userId: userId === "unassign" ? null : userId,
-      });
+      const res = await axios.post(`/api/issues/${issueId}`, { userId });
       return res.data;
     },
     onSuccess: ({ message }: { message: string }) => {
       toast.success(message);
+      refresh();
     },
     onError: (err: AxiosError<{ error: string }>) => {
       toast.error(err.response?.data?.error || "Failed to update assignment.");
