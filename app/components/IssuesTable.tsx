@@ -81,7 +81,7 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {issues.length > 0 ? (
+        {issues?.length > 0 ? (
           issues.map((k) => (
             <Table.Row key={k.id}>
               <Table.Cell>

@@ -1,5 +1,5 @@
 import { Box, Flex, Skeleton } from "@radix-ui/themes";
-import IssueTableSkeleton from "../components/IssueTableSkeleton";
+import IssueTableSkeleton from "../../components/IssueTableSkeleton";
 
 const DelegatedIssueLoading = () => {
   return (

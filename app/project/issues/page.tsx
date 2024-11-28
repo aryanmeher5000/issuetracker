@@ -50,7 +50,7 @@ const IssuePage = async ({
     skip: (pageParsed - 1) * pageSize,
   });
   const count = await prisma.issue.count({
-    where: { status: validStatus },
+    where: { status: validStatus, priority: validPriority },
   });
 
   return (
