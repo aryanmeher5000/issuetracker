@@ -2,92 +2,95 @@
 import { Priority, Status } from "@prisma/client";
 import { Flex, Select } from "@radix-ui/themes";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import React, { useMemo } from "react";
+
+// Reusable Select Component
+const FilterSelect = ({
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: Record<string, string>;
+  onChange: (value: string) => void;
+}) => (
+  <Select.Root onValueChange={onChange} defaultValue={value}>
+    <Select.Trigger />
+    <Select.Content>
+      <Select.Item key="undefined" value="undefined">
+        All
+      </Select.Item>
+      {Object.entries(options).map(([key, val]) => (
+        <Select.Item key={key} value={val}>
+          {val}
+        </Select.Item>
+      ))}
+    </Select.Content>
+  </Select.Root>
+);
 
 const Filters = () => {
   const { push } = useRouter();
-
-  // Get search params
   const searchParams = useSearchParams();
   const pathName = usePathname();
 
-  //Get current status
-  const stat = searchParams.get("status");
-  const prio = searchParams.get("priority");
-  const currStat =
-    stat && Object.values(Status).includes(stat as Status) ? stat : "undefined";
-  const currPrio =
-    prio && Object.values(Priority).includes(prio as Priority)
-      ? stat
-      : "undefined";
+  // Memoize current filter values
+  const currStat = useMemo(
+    () =>
+      searchParams.get("status") &&
+      Object.values(Status).includes(searchParams.get("status") as Status)
+        ? searchParams.get("status")
+        : "undefined",
+    [searchParams]
+  );
+  const currPrio = useMemo(
+    () =>
+      searchParams.get("priority") &&
+      Object.values(Priority).includes(searchParams.get("priority") as Priority)
+        ? searchParams.get("priority")
+        : "undefined",
+    [searchParams]
+  );
 
-  //Handle the change in status
-  function handleStatusChange(status: string) {
-    //Create a params object
+  // Generic function to handle filter changes
+  const handleFilterChange = (type: "status" | "priority", value: string) => {
     const params = new URLSearchParams(searchParams.toString());
-    // Update or delete the status parameter based on selection
-    if (status === "undefined") {
-      params.delete("status");
+
+    // Update or delete the filter parameter
+    if (value === "undefined") {
+      params.delete(type);
     } else {
-      params.set("status", status);
+      params.set(type, value);
     }
-    //Delete the page param
-    if (params.has("page")) params.delete("page");
-    // Push updated query to the router
+
+    // Remove the page param to reset pagination
+    params.delete("page");
+
+    // Update the URL
     const query = params.toString()
       ? `${pathName}?${params.toString()}`
       : pathName;
     push(query);
-  }
-
-  function handlePriorityChange(priority: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    // Update or delete the status parameter based on selection
-    if (priority === "undefined") {
-      params.delete("priority");
-    } else {
-      params.set("priority", priority);
-    }
-    //Delete the page param
-    if (params.has("page")) params.delete("page");
-    // Push updated query to the router
-    const query = params.toString()
-      ? `${pathName}?${params.toString()}`
-      : pathName;
-    push(query);
-  }
+  };
 
   return (
     <Flex gap="2">
-      <Select.Root onValueChange={handleStatusChange} defaultValue={currPrio}>
-        <Select.Trigger placeholder="Filter by status" />
-        <Select.Content>
-          {/* Option for all statuses */}
-          <Select.Item key="undefined" value="undefined">
-            All
-          </Select.Item>
-          {/* Dynamically generate options from Status */}
-          {Object.entries(Status).map(([key, value]) => (
-            <Select.Item key={key} value={value}>
-              {value}
-            </Select.Item>
-          ))}
-        </Select.Content>
-      </Select.Root>
-      <Select.Root onValueChange={handlePriorityChange} defaultValue={currStat}>
-        <Select.Trigger placeholder="Filter by priority" />
-        <Select.Content>
-          {/* Option for all statuses */}
-          <Select.Item key="undefined" value="undefined">
-            All
-          </Select.Item>
-          {/* Dynamically generate options from Status */}
-          {Object.entries(Priority).map(([key, value]) => (
-            <Select.Item key={key} value={value}>
-              {value}
-            </Select.Item>
-          ))}
-        </Select.Content>
-      </Select.Root>
+      {/* Status Filter */}
+      <FilterSelect
+        label="Status"
+        value={currStat}
+        options={Status}
+        onChange={(status) => handleFilterChange("status", status)}
+      />
+
+      {/* Priority Filter */}
+      <FilterSelect
+        label="Priority"
+        value={currPrio}
+        options={Priority}
+        onChange={(priority) => handleFilterChange("priority", priority)}
+      />
     </Flex>
   );
 };
