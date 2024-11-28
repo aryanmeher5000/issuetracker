@@ -2,11 +2,13 @@ import { createIssueSchema } from "@/app/validationSchema";
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../auth/auth";
+import { getProjectId } from "@/app/lib/getProjectId";
 
 //Create a new issue -- USERS
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const session = await auth();
+  const projectId = await getProjectId();
 
   //Only logged in users can create
   if (!session || !session.user)
@@ -19,7 +21,7 @@ export async function POST(req: NextRequest) {
   if (!valid.success)
     return NextResponse.json(valid.error.format(), { status: 400 });
 
-  const newIssue = await prisma.issue.create({ data: body });
+  const newIssue = await prisma.issue.create({ data: { ...body, projectId } });
 
   return NextResponse.json(newIssue, { status: 201 });
 }

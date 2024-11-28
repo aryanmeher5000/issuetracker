@@ -118,7 +118,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           </Box>
         )}
         {/*Set deadline optional*/}
-        {issue && data?.user.role === "ADMIN" && (
+        {/* {issue && data?.user === "ADMIN" && (
           <>
             <Flex align="center" gap="2">
               <Text>Deadline:</Text>
@@ -129,7 +129,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
             </Flex>
             <Error>{errors.deadline?.message}</Error>
           </>
-        )}
+        )} */}
 
         {/* Submit Button */}
         <Button type="submit" disabled={isLoading || !isDirty}>
@@ -151,7 +151,7 @@ function useCreateIssue() {
       return res.data; // Return only the response data
     },
     onSuccess: () => {
-      router.push("/issues"); // Navigate to the issues page
+      router.push("/project/issues"); // Navigate to the issues page
       router.refresh(); // Refresh the data
       toast.success("Issue created successfully!"); // Add success feedback
     },
@@ -177,7 +177,7 @@ function useUpdateIssue() {
     },
     onSuccess: () => {
       toast.success("Issue updated successfully!");
-      router.push("/issues");
+      router.push("/project/issues");
       // `router.refresh()` is not available in Next.js router. If you're using Next.js App Router, remove the refresh.
     },
     onError: (error) => {

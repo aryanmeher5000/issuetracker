@@ -3,6 +3,7 @@ import { Project } from "@prisma/client";
 import { Flex, Heading, Table, Text, Button, Grid } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import UserAvatar from "../components/UserAvatar";
+import Cookie from "js-cookie";
 
 const SelectProject = ({ projects }: { projects: Project[] }) => {
   // Filter projects based on type
@@ -58,6 +59,10 @@ function RenderTable({
   projects: Project[];
 }) {
   const { push } = useRouter();
+  function handleSelectProject(id: number) {
+    Cookie.set("projectId", id);
+    push("/project");
+  }
 
   return (
     <Flex direction="column" gap="3" align="center">
@@ -69,7 +74,7 @@ function RenderTable({
               style={{ minWidth: "100%" }}
               key={project.id}
               className="hover:bg-gray-200 cursor-pointer"
-              onClick={() => push("/project/" + project.id)}
+              onClick={() => handleSelectProject(project.id)}
             >
               <Table.Cell className="text-center">
                 <Text>{project.name}</Text>

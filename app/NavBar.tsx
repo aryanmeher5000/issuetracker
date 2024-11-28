@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 import { IoIosBug } from "react-icons/io";
 import UserAvatar from "./components/UserAvatar";
 import useProject from "./store";
+import NavbarSkeleton from "./NavbarSkeleton";
 
 const NavBar = () => {
   return (
@@ -30,9 +31,9 @@ const NavBar = () => {
 };
 
 const RenderLinks = () => {
-  const {
-    project: { type },
-  } = useProject();
+  const currentPath = usePathname();
+  const { project } = useProject();
+  if (!project?.type) return <NavbarSkeleton />;
   const links = [
     {
       name: "Project",
@@ -50,12 +51,11 @@ const RenderLinks = () => {
       condition: true,
     },
     {
-      name: type === "GROUP" ? "Pledged" : "Delegated",
+      name: project?.type === "GROUP" ? "Pledged" : "Delegated",
       href: "/project/delegated",
-      condition: type !== "PERSONAL",
+      condition: project?.type !== "PERSONAL",
     },
   ];
-  const currentPath = usePathname();
 
   return (
     <Flex gap="4" className="font-medium">

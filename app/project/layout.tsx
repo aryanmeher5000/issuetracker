@@ -1,20 +1,15 @@
-import React from "react";
-import NavBar from "../NavBar";
+import React, { PropsWithChildren } from "react";
 import prisma from "@/prisma/client";
 import ProjectProvider from "./ProjectProvider";
+import dynamic from "next/dynamic";
+import { getProjectId } from "../lib/getProjectId";
+const NavBar = dynamic(() => import("../NavBar"));
 
-const ProjectLayout = async ({
-  params,
-  children,
-}: {
-  params: Promise<{ id: string }>;
-  children: React.ReactNode;
-}) => {
-  const { id } = await params;
+const ProjectLayout = async ({ children }: PropsWithChildren) => {
+  const id = await getProjectId();
   const projectInfo = await prisma.project.findUnique({
-    where: { id: parseInt(id) },
+    where: { id: id },
   });
-
   return (
     <ProjectProvider project={projectInfo}>
       <NavBar />

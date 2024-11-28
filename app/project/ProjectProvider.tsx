@@ -1,5 +1,6 @@
+"use client";
 import { Project } from "@prisma/client";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import useProject from "../store";
 import { useSession } from "next-auth/react";
 
@@ -11,7 +12,13 @@ interface Inp {
 const ProjectProvider = ({ children, project }: Inp) => {
   const { data } = useSession();
   const { setProjectInfo } = useProject();
-  setProjectInfo(data?.user?.email, project);
+
+  useEffect(() => {
+    if (data?.user?.email) {
+      setProjectInfo(data.user.email, project);
+    }
+  }, [data?.user?.email, project, setProjectInfo]);
+
   return <div>{children}</div>;
 };
 

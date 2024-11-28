@@ -7,7 +7,9 @@ const IssuesToolbar = () => {
   const router = useRouter();
   return (
     <Box>
-      <Button onClick={() => router.push("/issues/new")}>New Issue</Button>
+      <Button onClick={() => router.push("/project/issues/new")}>
+        New Issue
+      </Button>
     </Box>
   );
 };
