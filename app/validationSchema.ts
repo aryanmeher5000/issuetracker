@@ -11,6 +11,7 @@ export type CreateProject = z.infer<typeof createProjectScehma>;
 export const createIssueSchema = z.object({
   title: z.string().min(3).max(250, "Title is too long."),
   description: z.string().min(3).max(500, "Description is too long."),
+  priority: z.enum(["HIGH", "MEDIUM", "LOW"]).optional(),
 });
 
 export const updateIssueSchema = z
@@ -24,6 +25,7 @@ export const updateIssueSchema = z
       .min(3, "Description is too short")
       .max(500, "Description is too long."),
     status: z.enum(["OPEN", "IN_PROGRESS", "CLOSED"]),
+    priority: z.enum(["HIGH", "MEDIUM", "LOW"]).optional(),
     deadline: z.date(),
   })
   .partial();

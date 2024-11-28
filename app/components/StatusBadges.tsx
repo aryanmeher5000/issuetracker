@@ -1,8 +1,15 @@
-import { Status } from "@prisma/client";
+import { Priority, Status } from "@prisma/client";
 import { Badge } from "@radix-ui/themes";
 import React from "react";
 
-const StatusBadges = ({ status }: { status: Status }) => {
+const StatusBadges = ({
+  status,
+  priority,
+}: {
+  status?: Status;
+  priority?: Priority;
+}) => {
+  // Mapping for status
   const statusMap: Record<
     Status,
     { label: string; color: "red" | "green" | "violet" }
@@ -11,8 +18,28 @@ const StatusBadges = ({ status }: { status: Status }) => {
     CLOSED: { label: "Closed", color: "green" },
     IN_PROGRESS: { label: "In Progress", color: "violet" },
   };
+
+  // Mapping for priority
+  const priorityMap: Record<
+    Priority,
+    { label: string; color: "orange" | "yellow" | "cyan" }
+  > = {
+    HIGH: { label: "High", color: "orange" },
+    MEDIUM: { label: "Medium", color: "yellow" },
+    LOW: { label: "Low", color: "cyan" },
+  };
+
   return (
-    <Badge color={statusMap[status].color}>{statusMap[status].label}</Badge>
+    <>
+      {status && (
+        <Badge color={statusMap[status].color}>{statusMap[status].label}</Badge>
+      )}
+      {priority && (
+        <Badge color={priorityMap[priority].color}>
+          {priorityMap[priority].label}
+        </Badge>
+      )}
+    </>
   );
 };
 

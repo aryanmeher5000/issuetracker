@@ -4,7 +4,7 @@ import React from "react";
 import IssuesToolbar from "./IssuesToolbar";
 import IssuesTable from "../../components/IssuesTable";
 import Filters from "../../components/Filters";
-import { Status } from "@prisma/client";
+import { Priority, Status } from "@prisma/client";
 import Pagination from "./_components/Pagination";
 import { Metadata } from "next";
 import { getProjectId } from "@/app/lib/getProjectId";
@@ -14,13 +14,14 @@ const IssuePage = async ({
 }: {
   searchParams: Promise<{
     status: string;
+    priority: string;
     orderBy: string;
     order: string;
     page: string;
   }>;
 }) => {
   // Construct the orderBy object dynamically
-  const { status, orderBy, order, page } = await searchParams;
+  const { status, priority, orderBy, order, page } = await searchParams;
   const pageParsed = parseInt(page) || 1;
   const projectId = await getProjectId();
   const pageSize = 10;
@@ -29,9 +30,17 @@ const IssuePage = async ({
     status && Object.values(Status).includes(status as Status)
       ? (status as Status)
       : undefined;
+  const validPriority =
+    priority && Object.values(Priority).includes(priority as Priority)
+      ? (priority as Priority)
+      : undefined;
 
   const issues = await prisma.issue.findMany({
-    where: { projectId: projectId, status: validStatus },
+    where: {
+      projectId: projectId,
+      status: validStatus,
+      priority: validPriority,
+    },
     orderBy: orderBy
       ? {
           [orderBy]: order || "asc",

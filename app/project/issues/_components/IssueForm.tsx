@@ -1,7 +1,7 @@
 "use client";
 import { createIssueSchema, updateIssueSchema } from "@/app/validationSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Issue, Status } from "@prisma/client";
+import { Issue, Priority, Status } from "@prisma/client";
 import {
   Text,
   Box,
@@ -18,9 +18,8 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
-import { z } from "zod";
+import { isValid, z } from "zod";
 import { Error } from "../../../components";
-import { useSession } from "next-auth/react";
 const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
 });
@@ -38,13 +37,12 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     register,
     handleSubmit,
     control,
-    formState: { errors, isDirty },
+    formState: { errors, isValid, isDirty },
   } = useForm<FormData>({
     defaultValues: { ...issue, deadline: issue?.deadline || undefined },
     resolver: zodResolver(schema), // Correct schema
   });
 
-  const { data } = useSession();
   const crtIssue = useCreateIssue();
   const updIssue = useUpdateIssue();
   const isLoading = crtIssue.isPending || updIssue.isPending;
@@ -117,8 +115,36 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
             />
           </Box>
         )}
+
+        {/*Set priority*/}
+        <Box>
+          <Controller
+            name="priority"
+            control={control}
+            defaultValue={issue?.priority}
+            render={({ field }) => (
+              <Select.Root
+                value={field.value!} // Bind the value from react-hook-form
+                onValueChange={(value) => field.onChange(value)} // Use onValueChange for updates
+              >
+                <Select.Trigger
+                  placeholder="Set priority"
+                  style={{ width: "140px" }}
+                />
+                <Select.Content>
+                  {Object.entries(Priority).map(([key, label]) => (
+                    <Select.Item key={key} value={key}>
+                      {label}
+                    </Select.Item>
+                  ))}
+                </Select.Content>
+              </Select.Root>
+            )}
+          />
+        </Box>
+
         {/*Set deadline optional*/}
-        {/* {issue && data?.user === "ADMIN" && (
+        {/*  (
           <>
             <Flex align="center" gap="2">
               <Text>Deadline:</Text>
@@ -132,7 +158,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         )} */}
 
         {/* Submit Button */}
-        <Button type="submit" disabled={isLoading || !isDirty}>
+        <Button type="submit" disabled={isLoading || !isValid || !isDirty}>
           {issue ? "Update This Issue" : "Submit New Issue"}{" "}
           {isLoading && <Spinner />}
         </Button>

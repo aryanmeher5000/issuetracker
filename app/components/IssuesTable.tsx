@@ -19,6 +19,11 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
       class: "hidden md:table-cell ",
     },
     {
+      label: "Priority",
+      value: "priority",
+      class: "hidden md:table-cell ",
+    },
+    {
       label: "Created At",
       value: "createdAt",
       class: "cursor-pointer",
@@ -87,6 +92,9 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
                 {<Badge status={k.status} />}
+              </Table.Cell>
+              <Table.Cell>
+                <Badge priority={k?.priority} />
               </Table.Cell>
               <Table.Cell>{k.createdAt.toDateString()}</Table.Cell>
             </Table.Row>
