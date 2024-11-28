@@ -69,18 +69,26 @@ function RenderTable({
       <Heading as="h6">{title}</Heading>
       <Table.Root variant="surface" className="w-full">
         <Table.Body>
-          {projects.map((project) => (
-            <Table.Row
-              style={{ minWidth: "100%" }}
-              key={project.id}
-              className="hover:bg-gray-200 cursor-pointer"
-              onClick={() => handleSelectProject(project.id)}
-            >
+          {projects?.length > 0 ? (
+            projects.map((project) => (
+              <Table.Row
+                style={{ minWidth: "100%" }}
+                key={project.id}
+                className="hover:bg-gray-200 cursor-pointer"
+                onClick={() => handleSelectProject(project.id)}
+              >
+                <Table.Cell className="text-center">
+                  <Text>{project.name}</Text>
+                </Table.Cell>
+              </Table.Row>
+            ))
+          ) : (
+            <Table.Row>
               <Table.Cell className="text-center">
-                <Text>{project.name}</Text>
+                No projects found.
               </Table.Cell>
             </Table.Row>
-          ))}
+          )}
         </Table.Body>
       </Table.Root>
     </Flex>

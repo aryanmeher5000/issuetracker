@@ -85,7 +85,7 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
           issues.map((k) => (
             <Table.Row key={k.id}>
               <Table.Cell>
-                <Link href={`/issues/${k.id}`}>{k.title}</Link>
+                <Link href={`/project/issues/${k.id}`}>{k.title}</Link>
                 <div className="div md:hidden">
                   {<Badge status={k.status} />}
                 </div>

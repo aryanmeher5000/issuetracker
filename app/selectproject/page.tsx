@@ -7,7 +7,7 @@ const SelectProjectPage = async () => {
   const projects = await prisma.project.findMany({
     where: {
       OR: [
-        { members: { has: profile?.user?.email } },
+        { users: { has: profile?.user?.email } },
         { admins: { has: profile?.user?.email } },
       ],
     },

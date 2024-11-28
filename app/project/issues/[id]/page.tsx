@@ -10,10 +10,6 @@ import ReopenIssueButton from "./ReopenIssueButton";
 import { Metadata } from "next";
 import { cache } from "react";
 
-interface Props {
-  id: string;
-}
-
 const fetchUser = cache((issueId: number) => {
   return prisma.issue.findUnique({
     where: { id: issueId },
@@ -23,7 +19,11 @@ const fetchUser = cache((issueId: number) => {
   });
 });
 
-const IssueDetailPage = async ({ params }: { params: Promise<Props> }) => {
+const IssueDetailPage = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
   // Authenticate the user.
   const session = await auth();
   const { id } = await params;

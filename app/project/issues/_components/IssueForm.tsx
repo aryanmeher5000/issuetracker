@@ -18,7 +18,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import toast, { Toaster } from "react-hot-toast";
-import { isValid, z } from "zod";
+import { z } from "zod";
 import { Error } from "../../../components";
 const SimpleMde = dynamic(() => import("react-simplemde-editor"), {
   ssr: false,
@@ -65,7 +65,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
   };
 
   return (
-    <Box className="max-w-xl  p-4">
+    <Box className="max-w-xl" p="4">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <TextField.Root
           placeholder="Title"
