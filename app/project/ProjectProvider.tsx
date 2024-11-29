@@ -22,6 +22,10 @@ const ProjectProvider = ({ children, project }: Inp) => {
     }
   }, [data?.user?.email, project, setProjectInfo]);
 
+  if (!data) {
+    push("/api/auth/signin");
+  }
+
   if (!project) {
     push("/selectproject");
     toast.error("Error loading project!");

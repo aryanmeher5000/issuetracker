@@ -2,9 +2,13 @@ import prisma from "@/prisma/client";
 import SelectProject from "./SelectProject";
 import { auth } from "../api/auth/auth";
 import { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 const SelectProjectPage = async () => {
   const profile = await auth();
+
+  if (!profile) redirect("/api/auth/signin");
+
   const projects = await prisma.project.findMany({
     where: {
       OR: [

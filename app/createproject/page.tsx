@@ -1,7 +1,12 @@
 import { Metadata } from "next";
 import CreateProjectFxn from "./CreateProject";
+import { auth } from "../api/auth/auth";
+import { redirect } from "next/navigation";
 
-const CreateNewProject = () => {
+const CreateNewProject = async () => {
+  const profile = await auth();
+  if (!profile) redirect("/api/auth/signin");
+
   return <CreateProjectFxn />;
 };
 
