@@ -6,7 +6,6 @@ import {
   Table,
   Text,
   Button,
-  Grid,
   Tabs,
   Box,
 } from "@radix-ui/themes";

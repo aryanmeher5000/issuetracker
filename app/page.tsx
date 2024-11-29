@@ -1,13 +1,17 @@
 import { Flex, Heading, Text } from "@radix-ui/themes";
-import { Metadata } from "next";
 import { IoIosBug } from "react-icons/io";
 import { SiSolus } from "react-icons/si";
+import { Link } from "./components";
+import { Metadata } from "next";
 
 export default function Home() {
   return (
-    <Flex direction="column" align="center" gap="6" p="4">
+    <Flex direction="column" align="center" gap="6" p="4" width="100%">
       <IoIosBug fontSize="20vh" />
+
       <Heading size="9">Issue Tracker</Heading>
+
+      <Link href="/selectproject">Create or Work on a project</Link>
 
       <Text>
         Our issue tracker is designed to simplify the way you manage and resolve

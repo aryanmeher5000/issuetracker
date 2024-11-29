@@ -1,6 +1,7 @@
 import prisma from "@/prisma/client";
 import SelectProject from "./SelectProject";
 import { auth } from "../api/auth/auth";
+import { Metadata } from "next";
 
 const SelectProjectPage = async () => {
   const profile = await auth();
@@ -16,3 +17,7 @@ const SelectProjectPage = async () => {
 };
 
 export default SelectProjectPage;
+export const metadata: Metadata = {
+  title: "Issue Tracker - Select Project",
+  description: "Select a project you wnat to work on.",
+};

@@ -6,7 +6,6 @@ import {
   Text,
   Table,
   TextField,
-  Separator,
   Box,
   Tabs,
   AlertDialog,
@@ -15,12 +14,13 @@ import { useRouter } from "next/navigation";
 import useProject from "../store";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 import InputErrorMessage from "../components/InputErrorMessage";
 import toast, { Toaster } from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import UserAvatar from "../components/UserAvatar";
+import ProjectLoading from "./loading";
 
 interface Props {
   userEmail: string;
@@ -37,7 +37,7 @@ const AddOrRemoveMembers = ({
   const { push } = useRouter();
   const { data } = useSession();
 
-  if (!project) return <Text>Loading...</Text>;
+  if (!project) return <ProjectLoading />;
 
   return (
     <Flex direction="column" align="center" gap="5" p="4">
@@ -322,7 +322,9 @@ function useHandleMembers() {
       },
       onSuccess: (data, { action }) => {
         toast.success(data.message || "Member updated successfully.");
-        action === "leave" ? push("/selectproject") : refresh();
+        if (action === "leave") {
+          push("/selectproject");
+        } else refresh();
       },
       onError: (err) => {
         toast.error(err?.response?.data?.error || "An error occurred!");
