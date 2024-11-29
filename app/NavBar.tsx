@@ -1,11 +1,17 @@
 "use client";
-import { Box, Button, DropdownMenu, Flex, Text } from "@radix-ui/themes";
+import {
+  Avatar,
+  Box,
+  Button,
+  DropdownMenu,
+  Flex,
+  Text,
+} from "@radix-ui/themes";
 import classNames from "classnames";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IoIosBug } from "react-icons/io";
-import UserAvatar from "./components/UserAvatar";
 import useProject from "./store";
 import NavbarSkeleton from "./NavbarSkeleton";
 
@@ -90,7 +96,13 @@ const RenderAuth = () => {
         {status === "authenticated" && (
           <DropdownMenu.Root>
             <DropdownMenu.Trigger>
-              <UserAvatar size="4" />
+              <Avatar
+                src={session!.user!.image!}
+                fallback="?"
+                referrerPolicy="no-referrer"
+                radius="full"
+                size="4"
+              />
             </DropdownMenu.Trigger>
             <DropdownMenu.Content>
               <DropdownMenu.Label>

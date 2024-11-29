@@ -37,13 +37,9 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     register,
     handleSubmit,
     control,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isDirty },
   } = useForm<FormData>({
-    defaultValues: {
-      ...issue,
-      deadline: issue?.deadline || undefined,
-      priority: issue?.priority || undefined,
-    },
+    defaultValues: issue,
     resolver: zodResolver(schema), // Correct schema
   });
 
@@ -152,7 +148,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
 
         {/* Submit Button */}
         <Box>
-          <Button type="submit" disabled={isLoading || !isValid || !isDirty}>
+          <Button type="submit" disabled={isLoading || !isDirty}>
             {issue ? "Update This Issue" : "Submit New Issue"}{" "}
             {isLoading && <Spinner />}
           </Button>

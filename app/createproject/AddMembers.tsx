@@ -7,6 +7,7 @@ import InputErrorMessage from "../components/InputErrorMessage";
 import { useSession } from "next-auth/react";
 import { CreateProject } from "../validationSchema";
 import { UseFormSetValue } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 const emailSchema = z.string().email("Invalid email format");
 
@@ -18,15 +19,18 @@ const AddMembers = ({
   setValue: UseFormSetValue<CreateProject>;
 }) => {
   const { data: session, status } = useSession();
+  const { push } = useRouter();
   const [admins, setAdmins] = useState<string[]>([]);
   const [users, setUsers] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  if (!session || !session.user?.email) push("/api/auth/signin");
+
   // Add current user's email to admins once session data is ready
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
-      setAdmins((prev) => [...prev, session!.user!.email!]);
+      setAdmins([session!.user!.email!]);
       setValue("admins", [...admins, session.user.email]);
     }
   }, [session, status, setValue]); // Update when session or status changes
@@ -117,6 +121,7 @@ const AddMembers = ({
           title={watchType === "GROUP" ? "Members" : "Admins"}
           data={admins}
           onRemove={(index) => handleRemoveMember("admin", index)}
+          currUser={session!.user!.email!}
         />
       )}
 
@@ -126,6 +131,7 @@ const AddMembers = ({
           title="Users"
           data={users}
           onRemove={(index) => handleRemoveMember("user", index)}
+          currUser={session!.user!.email!}
         />
       )}
     </Flex>
@@ -135,10 +141,12 @@ const AddMembers = ({
 const TableSection = ({
   title,
   data,
+  currUser,
   onRemove,
 }: {
   title: string;
   data: string[];
+  currUser: string;
   onRemove: (index: number) => void;
 }) => {
   return (
@@ -160,6 +168,7 @@ const TableSection = ({
                   <Button
                     variant="soft"
                     color="red"
+                    disabled={item === currUser}
                     onClick={() => onRemove(index)}
                   >
                     Remove
