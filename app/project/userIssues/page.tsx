@@ -7,6 +7,7 @@ import { Priority, Status } from "@prisma/client";
 import { Metadata } from "next";
 import { getProjectId } from "@/app/lib/getProjectId";
 import Pagination from "../issues/_components/Pagination";
+import { redirect } from "next/navigation";
 
 const UserIssues = async ({
   searchParams,
@@ -21,6 +22,8 @@ const UserIssues = async ({
 }) => {
   const session = await auth();
   const projectId = await getProjectId();
+
+  if (!session || !session.user?.email) redirect("/api/auth/signin");
 
   // Resolve the searchParams Promise
   const { status, priority, orderBy, order, page } = await searchParams;
@@ -39,7 +42,7 @@ const UserIssues = async ({
 
   // Fetch delegated issues for the user
   const delegatedIssues = await prisma.user.findUnique({
-    where: { email: session!.user.email! },
+    where: { email: session?.user?.email || undefined },
     select: {
       assignedIssues: {
         where: {
@@ -61,7 +64,7 @@ const UserIssues = async ({
   // Count the total number of delegated issues with projectId, status, and priority
   const count = await prisma.issue.count({
     where: {
-      assignedToUserId: session.user.email,
+      assignedToUserId: session?.user?.email,
       projectId: projectId,
       status: validStatus,
       priority: validPriority,
@@ -71,7 +74,7 @@ const UserIssues = async ({
   return (
     <Box className="space-y-4">
       <Filters />
-      <IssuesTable issues={delegatedIssues?.assignedIssues} />
+      <IssuesTable issues={delegatedIssues!.assignedIssues} />
       <Pagination
         itemCount={count}
         pageSize={pageSize}

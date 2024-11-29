@@ -26,7 +26,7 @@ const AddMembers = ({
   // Add current user's email to admins once session data is ready
   useEffect(() => {
     if (status === "authenticated" && session?.user?.email) {
-      setAdmins((prev) => [...new Set([...prev, session.user.email])]);
+      setAdmins((prev) => [...prev, session!.user!.email!]);
       setValue("admins", [...admins, session.user.email]);
     }
   }, [session, status, setValue]); // Update when session or status changes

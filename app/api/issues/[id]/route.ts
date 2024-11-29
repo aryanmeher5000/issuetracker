@@ -11,7 +11,7 @@ export async function POST(
 ) {
   // Authenticate user
   const session = await auth();
-  if (!session) {
+  if (!session || !session.user?.email) {
     return NextResponse.json(
       { error: "Unauthorized. Please log in." },
       { status: 401 }
@@ -82,7 +82,7 @@ export async function POST(
     {
       message:
         assigneeEmail !== "unassign"
-          ? `Issue successfully assigned to ${assignee.name}.`
+          ? `Issue successfully assigned to ${assignee!.name}.`
           : "Issue successfully unassigned.",
       issue: updatedIssue,
     },
@@ -97,7 +97,7 @@ export async function PATCH(
 ) {
   // Authenticate the user
   const session = await auth();
-  if (!session || !session.user) {
+  if (!session || !session.user?.email) {
     return NextResponse.json(
       { error: "User not authenticated!" },
       { status: 401 }
@@ -198,7 +198,7 @@ export async function DELETE(
   }
   //Check auth
   const session = await auth();
-  if (!session || !session.user) {
+  if (!session || !session.user?.email) {
     return NextResponse.json(
       { error: "Authorization denied!" },
       { status: 403 }

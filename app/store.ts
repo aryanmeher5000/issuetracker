@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 interface ProjectStore {
   isAdmin: boolean;
-  project: { id: number; name: string; type: string };
+  project: { id: number; name: string; type: string } | undefined;
   setProjectInfo: (userEmail: string, data: Project) => void;
 }
 

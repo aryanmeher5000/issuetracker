@@ -2,7 +2,6 @@ import { createProjectScehma } from "@/app/validationSchema";
 import prisma from "@/prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "../auth/auth";
-import { error } from "console";
 import { getProjectId } from "@/app/lib/getProjectId";
 
 //Create a new project
@@ -11,7 +10,7 @@ export async function POST(req: NextRequest) {
   const session = await auth();
 
   //Check auth
-  if (!session.user)
+  if (!session || !session.user?.email)
     return NextResponse.json(
       { error: "Please login to create project!" },
       { status: 403 }
@@ -37,8 +36,8 @@ export async function POST(req: NextRequest) {
 //Add/Remove member/ Leave
 export async function PUT(req: NextRequest) {
   // Check authentication
-  const { user } = await auth();
-  if (!user) {
+  const session = await auth();
+  if (!session || !session.user?.email) {
     return NextResponse.json(
       { error: "You are not authenticated!" },
       { status: 401 }
@@ -53,7 +52,7 @@ export async function PUT(req: NextRequest) {
   }
 
   // Check admin privileges
-  if (!project.admins.includes(user.email)) {
+  if (!project.admins.includes(session.user.email)) {
     return NextResponse.json(
       { error: "You are not authorized to perform this action!" },
       { status: 403 }
@@ -81,7 +80,7 @@ export async function PUT(req: NextRequest) {
     }
     if (type === "users" && project.users.includes(userEmail)) {
       return NextResponse.json(
-        { error: `${userEmail} is already a user.` },
+        { error: `${userEmail} is already a session.user.` },
         { status: 400 }
       );
     }
@@ -147,8 +146,8 @@ export async function PUT(req: NextRequest) {
 //Delete Project
 export async function DELETE() {
   //Check authentication
-  const { user } = await auth();
-  if (!user)
+  const session = await auth();
+  if (!session || !session.user?.email)
     return NextResponse.json(
       { error: "You are not authenticated!" },
       { status: 401 }
@@ -161,7 +160,7 @@ export async function DELETE() {
     return NextResponse.json({ error: "Project not found!" }, { status: 404 });
 
   //Check if admin previlages
-  if (!project.admins.includes(user.email))
+  if (!project.admins.includes(session.user.email))
     return NextResponse.json(
       {
         error: "You are not authorized to perform this action!",

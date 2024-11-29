@@ -20,8 +20,8 @@ const UserAvatar = ({
     );
   return (
     <Avatar
+      src={data!.user!.image!}
       fallback="?"
-      src={data?.user?.image}
       referrerPolicy="no-referrer"
       radius="full"
       size={size}

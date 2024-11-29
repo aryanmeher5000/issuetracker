@@ -7,10 +7,15 @@ export async function GET() {
   const requester = await auth();
   const project = await getProjectId();
 
+  if (!requester || !requester.user?.email)
+    return NextResponse.json(
+      { error: "You are not authorized, please signin!" },
+      { status: 401 }
+    );
+
   const isAdmin = await prisma.project.findUnique({
     where: { id: project, admins: { has: requester.user.email } },
   });
-
   if (!isAdmin)
     return NextResponse.json(
       { error: "Authorization denied!" },
@@ -29,8 +34,8 @@ export async function GET() {
     return NextResponse.json({ error: "Project not found!" }, { status: 404 });
   }
 
-  const adminEmails = projecte.admins || [];
-  const userEmails = projecte.users || [];
+  const adminEmails = projecte?.admins || [];
+  const userEmails = projecte?.users || [];
 
   // Fetch details for admins
   const adminsWithDetails = await prisma.user.findMany({

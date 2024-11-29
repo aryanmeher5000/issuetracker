@@ -8,10 +8,14 @@ const TakeLeadButton = ({ id }: { id: number }) => {
   const { mutate, isPending } = useAssignIssue();
   const { data } = useSession();
 
+  if (!data || !data.user?.email) return;
+
   return (
     <Button
       disabled={isPending}
-      onClick={() => mutate({ issueId: id, userId: data.user.email })}
+      onClick={() =>
+        mutate({ issueId: id, userId: data?.user?.email || undefined })
+      }
     >
       Take Lead{isPending && <Spinner />}
     </Button>

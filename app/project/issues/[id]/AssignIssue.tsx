@@ -16,7 +16,7 @@ const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
   return (
     <Box height="30px">
       <Select.Root
-        defaultValue={assignee?.email}
+        defaultValue={assignee?.email || undefined}
         onValueChange={(e) => mutate({ issueId: id, userId: e })}
         disabled={isMutating}
       >
@@ -27,12 +27,12 @@ const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
             Unassign
           </Select.Item>
 
-          {data?.admins.length ? (
+          {data?.admins && data?.admins?.length > 0 ? (
             <>
               <Select.Group>
                 <Select.Label>Admins</Select.Label>
                 {data.admins.map((admin) => (
-                  <Select.Item key={admin.email} value={admin.email}>
+                  <Select.Item key={admin.email} value={admin.email!}>
                     <Flex
                       justify="start"
                       align="center"
@@ -47,8 +47,8 @@ const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
                         size="1"
                       />
                       <Text>
-                        {admin.name.length > 25
-                          ? admin.name.slice(0, 25)
+                        {admin.name!.length > 25
+                          ? admin.name!.slice(0, 25)
                           : admin.name}
                       </Text>
                     </Flex>
@@ -65,7 +65,7 @@ const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
               <Select.Group>
                 <Select.Label>Users</Select.Label>
                 {data.users.map((user) => (
-                  <Select.Item key={user.email} value={user.email}>
+                  <Select.Item key={user.email} value={user.email!}>
                     <Flex
                       justify="start"
                       align="center"
@@ -80,8 +80,8 @@ const AssignIssue = ({ assignee, id }: { assignee?: User; id: number }) => {
                         size="1"
                       />
                       <Text>
-                        {user.name.length > 25
-                          ? user.name.slice(0, 25)
+                        {user.name!.length > 25
+                          ? user.name!.slice(0, 25)
                           : user.name}
                       </Text>
                     </Flex>

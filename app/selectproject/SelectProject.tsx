@@ -68,7 +68,7 @@ const SelectProject = ({ projects }: { projects: Project[] }) => {
 function RenderTable({ projects }: { projects: Project[] }) {
   const { push } = useRouter();
   function handleSelectProject(id: number) {
-    Cookie.set("projectId", id);
+    Cookie.set("projectId", id.toString());
     push("/project");
   }
 

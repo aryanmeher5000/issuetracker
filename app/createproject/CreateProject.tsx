@@ -91,7 +91,7 @@ function useCreateProject() {
       push("/selectproject");
     },
     onError: (err) => {
-      toast.error(err.response.data.message || "Error creating project");
+      toast.error(err?.response?.data.message || "Error creating project");
     },
   });
 }

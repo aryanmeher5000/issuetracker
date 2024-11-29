@@ -22,7 +22,7 @@ import { useSession } from "next-auth/react";
 import UserAvatar from "../components/UserAvatar";
 import ProjectLoading from "./loading";
 
-interface Props {
+export interface Props {
   userEmail: string;
   action: "add" | "remove" | "leave";
   type?: "users" | "admins";
@@ -93,9 +93,9 @@ const AddOrRemoveMembers = ({
 
           <Tabs.Content value="settings">
             <Flex justify="center" gap="4">
-              {projectInfo.admins.length > 1 && (
+              {projectInfo.admins.length > 1 && data?.user?.email && (
                 <LeaveButton
-                  userEmail={data?.user?.email}
+                  userEmail={data.user.email}
                   isDisabled={projectInfo.admins.length < 2}
                 />
               )}

@@ -39,7 +39,11 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     control,
     formState: { errors, isValid, isDirty },
   } = useForm<FormData>({
-    defaultValues: { ...issue, deadline: issue?.deadline || undefined },
+    defaultValues: {
+      ...issue,
+      deadline: issue?.deadline || undefined,
+      priority: issue?.priority || undefined,
+    },
     resolver: zodResolver(schema), // Correct schema
   });
 
@@ -125,7 +129,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         <Controller
           name="priority"
           control={control}
-          defaultValue={issue?.priority}
+          defaultValue={issue?.priority || undefined}
           render={({ field }) => (
             <Select.Root
               value={field.value!} // Bind the value from react-hook-form

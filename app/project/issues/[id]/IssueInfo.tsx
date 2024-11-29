@@ -17,7 +17,7 @@ const IssueInfo = ({
   assignedTo,
 }: {
   issueDetail: Issue;
-  assignedTo?: User;
+  assignedTo?: User | null;
 }) => {
   const { isAdmin, project } = useProject();
   const { data } = useSession();
@@ -34,7 +34,7 @@ const IssueInfo = ({
       <Flex gap="3" direction="column">
         {/*If type organization and user admin show assign issue button*/}
         {project.type === "ORGANIZATION" && isAdmin && (
-          <AssignIssue id={issueDetail.id} assignee={assignedTo} />
+          <AssignIssue id={issueDetail.id} assignee={assignedTo || undefined} />
         )}
         {project.type === "GROUP" && !assignedTo && (
           <TakeLeadButton id={issueDetail.id} />
@@ -52,7 +52,7 @@ const IssueInfo = ({
           (assignedTo?.email === data?.user?.email || isAdmin) && (
             <ReopenIssueButton id={issueDetail.id} />
           )}
-        {(isAdmin || assignedTo?.email === data.user.email) && (
+        {(isAdmin || assignedTo?.email === data?.user?.email) && (
           <DeleteIssueButton issueId={issueDetail.id} />
         )}
 
@@ -61,15 +61,15 @@ const IssueInfo = ({
           <Card>
             <Flex align="center" gap="1">
               <Avatar
-                src={assignedTo?.image}
+                src={assignedTo.image!}
                 fallback="?"
                 radius="full"
                 size="4"
               />
               <Text>
-                {assignedTo?.name.length > 50
+                {assignedTo.name!.length > 50
                   ? assignedTo.name
-                  : assignedTo.name.slice(0, 50)}
+                  : assignedTo.name!.slice(0, 50)}
               </Text>
             </Flex>
           </Card>

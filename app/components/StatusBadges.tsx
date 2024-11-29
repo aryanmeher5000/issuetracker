@@ -7,7 +7,7 @@ const StatusBadges = ({
   priority,
 }: {
   status?: Status;
-  priority?: Priority;
+  priority?: Priority | null;
 }) => {
   // Mapping for status
   const statusMap: Record<

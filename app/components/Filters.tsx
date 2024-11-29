@@ -2,7 +2,6 @@
 import { Priority, Status } from "@prisma/client";
 import { Flex, Select } from "@radix-ui/themes";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import React, { useMemo } from "react";
 
 // Reusable Select Component
 const FilterSelect = ({
@@ -36,22 +35,17 @@ const Filters = () => {
   const pathName = usePathname();
 
   // Memoize current filter values
-  const currStat = useMemo(
-    () =>
-      searchParams.get("status") &&
-      Object.values(Status).includes(searchParams.get("status") as Status)
-        ? searchParams.get("status")
-        : "undefined",
-    [searchParams]
-  );
-  const currPrio = useMemo(
-    () =>
-      searchParams.get("priority") &&
-      Object.values(Priority).includes(searchParams.get("priority") as Priority)
-        ? searchParams.get("priority")
-        : "undefined",
-    [searchParams]
-  );
+  const currStat =
+    searchParams.get("status") &&
+    Object.values(Status).includes(searchParams.get("status") as Status)
+      ? searchParams.get("status")
+      : "undefined";
+
+  const currPrio =
+    searchParams.get("priority") &&
+    Object.values(Priority).includes(searchParams.get("priority") as Priority)
+      ? searchParams.get("priority")
+      : "undefined";
 
   // Generic function to handle filter changes
   const handleFilterChange = (type: "status" | "priority", value: string) => {
@@ -79,7 +73,7 @@ const Filters = () => {
       {/* Status Filter */}
       <FilterSelect
         label="Status"
-        value={currStat}
+        value={currStat!}
         options={Status}
         onChange={(status) => handleFilterChange("status", status)}
       />
@@ -87,7 +81,7 @@ const Filters = () => {
       {/* Priority Filter */}
       <FilterSelect
         label="Priority"
-        value={currPrio}
+        value={currPrio!}
         options={Priority}
         onChange={(priority) => handleFilterChange("priority", priority)}
       />

@@ -65,7 +65,7 @@ interface TimelineItemProps {
   color: string;
   icon: React.ReactNode;
   label: string;
-  date?: Date;
+  date?: Date | null;
 }
 
 const TimelineItem = ({ color, icon, label, date }: TimelineItemProps) => {
