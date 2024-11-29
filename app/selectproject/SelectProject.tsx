@@ -1,6 +1,15 @@
 "use client";
 import { Project } from "@prisma/client";
-import { Flex, Heading, Table, Text, Button, Grid } from "@radix-ui/themes";
+import {
+  Flex,
+  Heading,
+  Table,
+  Text,
+  Button,
+  Grid,
+  Tabs,
+  Box,
+} from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import UserAvatar from "../components/UserAvatar";
 import Cookie from "js-cookie";
@@ -26,38 +35,38 @@ const SelectProject = ({ projects }: { projects: Project[] }) => {
       </Flex>
 
       {/* Create New Project Button */}
-      <Button onClick={() => push("/createproject")}>Create New Project</Button>
+      <Button onClick={() => push("/createproject")} color="lime">
+        Create New Project
+      </Button>
 
       {/* Project Tables */}
-      <Grid
-        columns={{ initial: "1", md: "3" }}
-        gap="6"
-        width={{ initial: "100%", sm: "70%", md: "80%" }}
-      >
-        {personalProjects.length > 0 && (
-          <RenderTable title="Personal" projects={personalProjects} />
-        )}
-        {groupProjects.length > 0 && (
-          <RenderTable title="Group" projects={groupProjects} />
-        )}
-        {organizationalProjects.length > 0 && (
-          <RenderTable
-            title="Organizational"
-            projects={organizationalProjects}
-          />
-        )}
-      </Grid>
+
+      <Tabs.Root defaultValue="personal" className="w-full md:w-7/12 lg:w-5/12">
+        <Tabs.List size="2" justify="center" color="amber">
+          <Tabs.Trigger value="personal">Personal</Tabs.Trigger>
+          <Tabs.Trigger value="group">Group</Tabs.Trigger>
+          <Tabs.Trigger value="organization">Organization</Tabs.Trigger>
+        </Tabs.List>
+
+        <Box pt="3">
+          <Tabs.Content value="personal">
+            <RenderTable projects={personalProjects} />
+          </Tabs.Content>
+
+          <Tabs.Content value="group">
+            <RenderTable projects={groupProjects} />
+          </Tabs.Content>
+
+          <Tabs.Content value="organization">
+            <RenderTable projects={organizationalProjects} />
+          </Tabs.Content>
+        </Box>
+      </Tabs.Root>
     </Flex>
   );
 };
 
-function RenderTable({
-  title,
-  projects,
-}: {
-  title: string;
-  projects: Project[];
-}) {
+function RenderTable({ projects }: { projects: Project[] }) {
   const { push } = useRouter();
   function handleSelectProject(id: number) {
     Cookie.set("projectId", id);
@@ -66,8 +75,7 @@ function RenderTable({
 
   return (
     <Flex direction="column" gap="3" align="center">
-      <Heading as="h6">{title}</Heading>
-      <Table.Root variant="surface" className="w-full">
+      <Table.Root className="w-full">
         <Table.Body>
           {projects?.length > 0 ? (
             projects.map((project) => (

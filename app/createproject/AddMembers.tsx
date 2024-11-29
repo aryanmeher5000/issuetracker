@@ -81,15 +81,28 @@ const AddMembers = ({
             onChange={() => error && setError(null)}
           />
           {watchType === "GROUP" ? (
-            <Button type="button" onClick={() => handleAddMember("admin")}>
+            <Button
+              type="button"
+              onClick={() => handleAddMember("admin")}
+              variant="soft"
+            >
               Add
             </Button>
           ) : (
             <>
-              <Button type="button" onClick={() => handleAddMember("admin")}>
+              <Button
+                type="button"
+                onClick={() => handleAddMember("admin")}
+                variant="soft"
+              >
                 Add Admin
               </Button>
-              <Button type="button" onClick={() => handleAddMember("user")}>
+              <Button
+                type="button"
+                onClick={() => handleAddMember("user")}
+                variant="soft"
+                color="blue"
+              >
                 Add User
               </Button>
             </>

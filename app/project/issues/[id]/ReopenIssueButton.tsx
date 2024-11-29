@@ -10,7 +10,7 @@ const ReopenIssueButton = ({ id }: { id: number }) => {
   const { mutate } = useReopenIssue();
 
   return (
-    <Button onClick={() => mutate(id)}>
+    <Button onClick={() => mutate(id)} variant="soft" color="orange">
       <GoIssueReopened />
       Reopen Issue
     </Button>
