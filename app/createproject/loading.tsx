@@ -6,8 +6,8 @@ const CreateProjectLoading = () => {
     <Flex direction="column" align="center" gap="6" p="4">
       <Skeleton
         style={{ borderRadius: "100px" }}
-        width="150px"
-        height="150px"
+        width="160px"
+        height="160px"
       />
 
       <Skeleton width="200px" height="50px" />

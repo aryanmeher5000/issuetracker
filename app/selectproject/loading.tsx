@@ -5,8 +5,8 @@ const SelectProjectLoading = () => {
     <Flex justify="center" align="center" direction="column" p="4" gap="6">
       <Skeleton
         style={{ borderRadius: "100px" }}
-        width="150px"
-        height="150px"
+        width="160px"
+        height="160px"
       />
 
       <Flex gap="2" direction="column">
