@@ -10,7 +10,7 @@ const SelectProjectLoading = () => {
       />
 
       <Flex gap="2" direction="column">
-        <Skeleton width="200px" height="50px" />
+        <Skeleton width="200px" height="40px" />
         <Skeleton width="200px" height="25px" />
       </Flex>
       <Skeleton width="200px" height="30px" />

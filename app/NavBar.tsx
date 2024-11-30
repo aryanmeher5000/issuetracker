@@ -17,7 +17,7 @@ import NavbarSkeleton from "./NavbarSkeleton";
 
 const NavBar = () => {
   return (
-    <nav className="flex gap-4 border-b mb-5 px-4 h-14 items-center">
+    <nav className="flex gap-4 border-b mb-5 px-2 md:px-4 h-14 items-center">
       <Flex justify="between" align="center" py="20px" width="100%">
         <RenderLinks />
         <RenderAuth />
@@ -54,11 +54,11 @@ const RenderLinks = () => {
   ];
 
   return (
-    <Flex gap="4" className="font-medium">
-      <Link href="/">
+    <Flex gap="4" className="font-medium size-4">
+      <Link href="/" className="hidden md:block">
         <IoIosBug className="size-6 text-zinc-800" />
       </Link>
-      <ul className="flex gap-4">
+      <ul className="flex gap-2.5 md:gap-4">
         {links.map(
           (k) =>
             k.condition && (
@@ -88,7 +88,7 @@ const RenderAuth = () => {
       <Box>
         {status === "unauthenticated" && (
           <Button color="blue">
-            <Link href="/api/auth/signin">Signup/Login</Link>
+            <Link href="/api/auth/signin">Signin</Link>
           </Button>
         )}
       </Box>

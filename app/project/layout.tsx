@@ -8,6 +8,8 @@ const NavBar = dynamic(() => import("../NavBar"));
 
 const ProjectLayout = async ({ children }: PropsWithChildren) => {
   const id = await getProjectId();
+  if (!id) redirect("/selectproject");
+
   const projectInfo = await prisma.project.findUnique({
     where: { id: id },
   });
