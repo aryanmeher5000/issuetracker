@@ -55,7 +55,7 @@ const AddMembers = ({
     }
     if (type === "user") {
       setUsers((prev) => [...prev, inputValue]);
-      setValue("members", [...users, inputValue]);
+      setValue("users", [...users, inputValue]);
     }
 
     if (inputRef.current) inputRef.current.value = "";
@@ -69,7 +69,7 @@ const AddMembers = ({
     } else if (type === "user") {
       const updatedUsers = users.filter((_, i) => i !== index);
       setUsers(updatedUsers);
-      setValue("members", updatedUsers);
+      setValue("users", updatedUsers);
     }
   };
 
