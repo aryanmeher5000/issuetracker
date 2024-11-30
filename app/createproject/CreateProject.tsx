@@ -25,6 +25,7 @@ const CreateProjectFxn = () => {
   const watchType = watch("type");
 
   const { mutate } = useCreateProject();
+  const { push } = useRouter();
 
   return (
     <Flex direction="column" align="center" gap="6" p="4">
@@ -66,7 +67,12 @@ const CreateProjectFxn = () => {
 
           <AddMembers watchType={watchType} setValue={setValue} />
 
-          <Button disabled={!isValid}>Create Project</Button>
+          <Flex gap="2">
+            <Button disabled={!isValid}>Create Project</Button>
+            <Button color="red" onClick={() => push("/selectproject")}>
+              Cancel
+            </Button>
+          </Flex>
         </Flex>
       </form>
       <Toaster />

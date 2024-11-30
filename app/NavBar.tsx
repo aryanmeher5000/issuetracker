@@ -54,7 +54,7 @@ const RenderLinks = () => {
   ];
 
   return (
-    <Flex gap="4" className="font-medium size-4">
+    <Flex gap="4" className="font-medium">
       <Link href="/" className="hidden md:block">
         <IoIosBug className="size-6 text-zinc-800" />
       </Link>
