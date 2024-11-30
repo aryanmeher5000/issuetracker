@@ -4,7 +4,7 @@ export const createProjectScehma = z.object({
   name: z.string().min(3).max(50),
   type: z.enum(["PERSONAL", "GROUP", "ORGANIZATION"]),
   admins: z.array(z.string().min(1)),
-  members: z.array(z.string()).optional(),
+  users: z.array(z.string()).optional(),
 });
 export type CreateProject = z.infer<typeof createProjectScehma>;
 
