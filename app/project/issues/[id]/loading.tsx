@@ -29,11 +29,11 @@ const DetailPageLoading = () => {
         </Card>
       </Box>
 
-      <Flex direction="column" gap="2" className="w-full">
+      <Flex direction="column" gap="2">
         {arr.map((k) => (
-          <Skeleton height="30px" className="w-full" key={k} />
+          <Skeleton height="30px" key={k} />
         ))}
-        <Skeleton height="60px" className="w-full" />
+        <Skeleton height="60px" />
       </Flex>
     </Grid>
   );
