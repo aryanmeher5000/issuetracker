@@ -1,4 +1,3 @@
-"use client";
 import { Button, Flex, Heading, Text } from "@radix-ui/themes";
 import { IoIosBug } from "react-icons/io";
 import { SiSolus } from "react-icons/si";
