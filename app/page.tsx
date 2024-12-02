@@ -2,11 +2,9 @@ import { Button, Flex, Heading, Text } from "@radix-ui/themes";
 import { IoIosBug } from "react-icons/io";
 import { SiSolus } from "react-icons/si";
 import { Metadata } from "next";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
-  const { push } = useRouter();
-
   return (
     <Flex direction="column" align="center" gap="6" p="4" width="100%">
       <IoIosBug fontSize="20vh" />
@@ -15,8 +13,8 @@ export default function Home() {
         Issue Tracker
       </Heading>
 
-      <Button color="lime" onClick={() => push("/selectproject")}>
-        Create or Work on a project
+      <Button color="lime">
+        <Link href="/selectproject">Create or Work on a project</Link>
       </Button>
 
       <Text>
