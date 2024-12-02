@@ -147,8 +147,12 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         />
 
         {/* Submit Button */}
-        <Box>
-          <Button type="submit" disabled={isLoading || !isDirty}>
+        <Box className="w-full">
+          <Button
+            type="submit"
+            disabled={isLoading || !isDirty}
+            className="w-full"
+          >
             {issue ? "Update This Issue" : "Submit New Issue"}{" "}
             {isLoading && <Spinner />}
           </Button>

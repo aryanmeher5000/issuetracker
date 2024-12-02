@@ -1,6 +1,7 @@
 import { Box, Card, Flex, Grid, Skeleton, Text } from "@radix-ui/themes";
 
 const DetailPageLoading = () => {
+  const arr = [1, 2, 3];
   return (
     <Grid columns={{ initial: "1", sm: "5" }} p="4" gap="4">
       <Box className="col-span-4">
@@ -12,35 +13,27 @@ const DetailPageLoading = () => {
         </Flex>
 
         <Card mb="4">
-          <Text>
-            <Skeleton />
-          </Text>
-          <Text>
-            <Skeleton />
-          </Text>
-          <Text>
-            <Skeleton />
-          </Text>
+          {arr.map((k) => (
+            <Text key={k}>
+              <Skeleton />
+            </Text>
+          ))}
         </Card>
 
-        <Card>
-          <Text>
-            <Skeleton />
-          </Text>
-          <Text>
-            <Skeleton />
-          </Text>
-          <Text>
-            <Skeleton />
-          </Text>
+        <Card mb="4">
+          {arr.map((k) => (
+            <Text key={k}>
+              <Skeleton />
+            </Text>
+          ))}
         </Card>
       </Box>
 
-      <Flex direction="column" gap="2" className="w-full">
-        <Skeleton height="30px" />
-        <Skeleton height="30px" />
-        <Skeleton height="30px" />
-        <Skeleton height="60px" />
+      <Flex direction="column" gap="2">
+        {arr.map((k) => (
+          <Skeleton height="30px" className="w-full" key={k} />
+        ))}
+        <Skeleton height="60px" className="w-full" />
       </Flex>
     </Grid>
   );
