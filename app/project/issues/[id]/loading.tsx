@@ -36,7 +36,7 @@ const DetailPageLoading = () => {
         </Card>
       </Box>
 
-      <Flex direction="column" gap="2" width="100%">
+      <Flex direction="column" gap="2" className="w-full">
         <Skeleton height="30px" />
         <Skeleton height="30px" />
         <Skeleton height="30px" />
