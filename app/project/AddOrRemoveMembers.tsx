@@ -91,7 +91,7 @@ const AddOrRemoveMembers = ({
                 <RenderTable
                   arr={projectInfo.users}
                   label="Users"
-                  isAdmin={false}
+                  isAdmin={isAdmin}
                 />
               )}
             </Flex>
