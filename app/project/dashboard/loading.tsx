@@ -3,7 +3,7 @@ import React from "react";
 
 const DashboardLoading = () => {
   return (
-    <Flex width="100%" height="100%" justify="center" align="center">
+    <Flex width="100%" height="90vh" justify="center" align="center">
       <Spinner size="3" />
     </Flex>
   );

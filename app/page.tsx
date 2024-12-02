@@ -1,10 +1,13 @@
-import { Flex, Heading, Text } from "@radix-ui/themes";
+"use client";
+import { Button, Flex, Heading, Text } from "@radix-ui/themes";
 import { IoIosBug } from "react-icons/io";
 import { SiSolus } from "react-icons/si";
-import { Link } from "./components";
 import { Metadata } from "next";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { push } = useRouter();
+
   return (
     <Flex direction="column" align="center" gap="6" p="4" width="100%">
       <IoIosBug fontSize="20vh" />
@@ -13,7 +16,9 @@ export default function Home() {
         Issue Tracker
       </Heading>
 
-      <Link href="/selectproject">Create or Work on a project</Link>
+      <Button color="lime" onClick={() => push("/selectproject")}>
+        Create or Work on a project
+      </Button>
 
       <Text>
         Our issue tracker is designed to simplify the way you manage and resolve
