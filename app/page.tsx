@@ -9,7 +9,9 @@ export default function Home() {
     <Flex direction="column" align="center" gap="6" p="4" width="100%">
       <IoIosBug fontSize="20vh" />
 
-      <Heading size="9">Issue Tracker</Heading>
+      <Heading size="9" align="center">
+        Issue Tracker
+      </Heading>
 
       <Link href="/selectproject">Create or Work on a project</Link>
 

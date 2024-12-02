@@ -73,7 +73,7 @@ const AddOrRemoveMembers = ({
                 </>
               )}
 
-              {isAdmin && (
+              {project.type !== "PERSONAL" && (
                 <RenderTable
                   arr={projectInfo.admins}
                   label={
@@ -83,10 +83,16 @@ const AddOrRemoveMembers = ({
                       ? "Members"
                       : ""
                   }
+                  isAdmin={isAdmin}
                 />
               )}
+
               {projectInfo?.users?.length > 0 && (
-                <RenderTable arr={projectInfo.users} label="Users" />
+                <RenderTable
+                  arr={projectInfo.users}
+                  label="Users"
+                  isAdmin={false}
+                />
               )}
             </Flex>
           </Tabs.Content>
@@ -180,7 +186,15 @@ function AddMember({ type }: { type: string }) {
   );
 }
 
-function RenderTable({ arr, label }: { arr: string[]; label: string }) {
+function RenderTable({
+  arr,
+  label,
+  isAdmin,
+}: {
+  arr: string[];
+  label: string;
+  isAdmin: boolean;
+}) {
   const { mutate, isPending } = useHandleMembers();
   const { data } = useSession();
 
@@ -198,20 +212,22 @@ function RenderTable({ arr, label }: { arr: string[]; label: string }) {
               <Table.Cell>
                 <Flex align="center" justify="between" gap="4">
                   <Text>{user}</Text>
-                  <Button
-                    variant="soft"
-                    color="red"
-                    disabled={isPending || user == data?.user?.email}
-                    onClick={() =>
-                      mutate({
-                        userEmail: user,
-                        action: "remove",
-                        type: "admins",
-                      })
-                    }
-                  >
-                    Remove
-                  </Button>
+                  {isAdmin && (
+                    <Button
+                      variant="soft"
+                      color="red"
+                      disabled={isPending || user == data?.user?.email}
+                      onClick={() =>
+                        mutate({
+                          userEmail: user,
+                          action: "remove",
+                          type: "admins",
+                        })
+                      }
+                    >
+                      Remove
+                    </Button>
+                  )}
                 </Flex>
               </Table.Cell>
             </Table.Row>

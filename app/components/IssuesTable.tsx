@@ -86,14 +86,15 @@ const IssuesTable = ({ issues }: { issues: Issue[] }) => {
             <Table.Row key={k.id}>
               <Table.Cell>
                 <Link href={`/project/issues/${k.id}`}>{k.title}</Link>
-                <div className="div md:hidden">
-                  {<Badge status={k.status} />}
+                <div className="div md:hidden space-x-2 mt-1">
+                  <Badge status={k.status} />
+                  <Badge priority={k?.priority} />
                 </div>
               </Table.Cell>
               <Table.Cell className="hidden md:table-cell">
                 {<Badge status={k.status} />}
               </Table.Cell>
-              <Table.Cell>
+              <Table.Cell className="hidden md:table-cell">
                 <Badge priority={k?.priority} />
               </Table.Cell>
               <Table.Cell>{k.createdAt.toDateString()}</Table.Cell>

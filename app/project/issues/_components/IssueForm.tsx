@@ -192,9 +192,9 @@ function useUpdateIssue() {
       const res = await axios.patch(`/api/issues/${id}`, data);
       return res.data; // Return only the response data
     },
-    onSuccess: () => {
-      toast.success("Issue updated successfully!");
-      router.push("/project/issues");
+    onSuccess: (data, { id }) => {
+      toast.success(data.message || "Issue updated successfully!");
+      router.push("/project/issues/" + id);
       // `router.refresh()` is not available in Next.js router. If you're using Next.js App Router, remove the refresh.
     },
     onError: (error) => {
