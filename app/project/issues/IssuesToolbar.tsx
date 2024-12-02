@@ -6,8 +6,11 @@ import React from "react";
 const IssuesToolbar = () => {
   const router = useRouter();
   return (
-    <Box>
-      <Button onClick={() => router.push("/project/issues/new")}>
+    <Box className="w-full">
+      <Button
+        className="w-full md:w-10"
+        onClick={() => router.push("/project/issues/new")}
+      >
         New Issue
       </Button>
     </Box>
