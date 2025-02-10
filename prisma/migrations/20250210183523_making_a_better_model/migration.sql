@@ -1,14 +1,14 @@
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('OPEN', 'IN_PROGRESS', 'CLOSED');
+CREATE TYPE "ProjectStatus" AS ENUM ('ACTIVE', 'COMPLETED', 'ARCHIVED');
 
 -- CreateEnum
-CREATE TYPE "ProjectType" AS ENUM ('PERSONAL', 'GROUP', 'ORGANIZATION');
+CREATE TYPE "IssueStatus" AS ENUM ('OPEN', 'IN_PROGRESS', 'CLOSED');
 
 -- CreateEnum
 CREATE TYPE "Priority" AS ENUM ('HIGH', 'MEDIUM', 'LOW');
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
+CREATE TYPE "Privilege" AS ENUM ('USER', 'ADMIN');
 
 -- CreateTable
 CREATE TABLE "accounts" (
@@ -50,47 +50,59 @@ CREATE TABLE "users" (
     "id" TEXT NOT NULL,
     "name" TEXT,
     "email" TEXT,
-    "email_verified" TIMESTAMP(3),
+    "emailVerified" TIMESTAMP(3),
     "image" TEXT,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "ProjectMember" (
-    "id" SERIAL NOT NULL,
-    "userId" TEXT NOT NULL,
-    "projectId" INTEGER NOT NULL,
-    "role" "Role" NOT NULL,
-
-    CONSTRAINT "ProjectMember_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
 CREATE TABLE "projects" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "type" "ProjectType" NOT NULL,
-    "tags" TEXT[],
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdById" TEXT NOT NULL,
+    "status" "ProjectStatus" NOT NULL DEFAULT 'ACTIVE',
+    "adminOnly" BOOLEAN NOT NULL DEFAULT false,
+    "roles" TEXT[],
 
     CONSTRAINT "projects_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "project_profiles" (
+    "id" SERIAL NOT NULL,
+    "userId" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+    "privilege" "Privilege" NOT NULL DEFAULT 'USER',
+
+    CONSTRAINT "project_profiles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "issues" (
     "id" SERIAL NOT NULL,
-    "title" VARCHAR(250) NOT NULL,
-    "description" TEXT NOT NULL,
-    "status" "Status" NOT NULL DEFAULT 'OPEN',
-    "priority" "Priority",
+    "projectId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "inProgression" TIMESTAMP(3),
     "closedAt" TIMESTAMP(3),
+    "createdById" TEXT NOT NULL,
+    "title" VARCHAR(250) NOT NULL,
+    "description" TEXT NOT NULL,
+    "status" "IssueStatus" NOT NULL DEFAULT 'OPEN',
+    "priority" "Priority" NOT NULL DEFAULT 'MEDIUM',
     "deadline" TIMESTAMP(3),
-    "projectId" INTEGER NOT NULL,
-    "assignedToUserId" TEXT,
 
     CONSTRAINT "issues_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "assigned_issues" (
+    "id" SERIAL NOT NULL,
+    "issueId" INTEGER NOT NULL,
+    "profileId" INTEGER NOT NULL,
+
+    CONSTRAINT "assigned_issues_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -105,12 +117,6 @@ CREATE UNIQUE INDEX "verification_tokens_identifier_token_key" ON "verification_
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
--- CreateIndex
-CREATE UNIQUE INDEX "ProjectMember_userId_projectId_key" ON "ProjectMember"("userId", "projectId");
-
--- CreateIndex
-CREATE INDEX "issues_assignedToUserId_idx" ON "issues"("assignedToUserId");
-
 -- AddForeignKey
 ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -118,13 +124,19 @@ ALTER TABLE "accounts" ADD CONSTRAINT "accounts_user_id_fkey" FOREIGN KEY ("user
 ALTER TABLE "sessions" ADD CONSTRAINT "sessions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProjectMember" ADD CONSTRAINT "ProjectMember_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "projects" ADD CONSTRAINT "projects_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ProjectMember" ADD CONSTRAINT "ProjectMember_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "project_profiles" ADD CONSTRAINT "project_profiles_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "issues" ADD CONSTRAINT "issues_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "issues" ADD CONSTRAINT "issues_projectId_fkey" FOREIGN KEY ("projectId") REFERENCES "projects"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "issues" ADD CONSTRAINT "issues_assignedToUserId_fkey" FOREIGN KEY ("assignedToUserId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "issues" ADD CONSTRAINT "issues_createdById_fkey" FOREIGN KEY ("createdById") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assigned_issues" ADD CONSTRAINT "assigned_issues_issueId_fkey" FOREIGN KEY ("issueId") REFERENCES "issues"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assigned_issues" ADD CONSTRAINT "assigned_issues_profileId_fkey" FOREIGN KEY ("profileId") REFERENCES "project_profiles"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
